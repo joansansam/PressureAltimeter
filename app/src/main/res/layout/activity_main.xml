@@ -3,16 +3,209 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/service_response_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:text="Pressure from service: "
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/api_title_tv" />
+
+    <TextView
+        android:id="@+id/calibration_pressure_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:text="\?"
+        app:layout_constraintStart_toEndOf="@+id/service_response_title"
+        app:layout_constraintTop_toBottomOf="@+id/api_title_tv" />
+
+    <TextView
+        android:id="@+id/formula_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:text="Formula:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pressure_title_tv" />
+
+    <Spinner
+        android:id="@+id/formula_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintStart_toEndOf="@+id/formula_title_tv"
+        app:layout_constraintTop_toBottomOf="@+id/pressure_title_tv" />
+
+    <ToggleButton
+        android:id="@+id/baro_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="ToggleButton"
+        android:textAllCaps="false"
+        android:textOff="Start"
+        android:textOn="Stop"
+        app:layout_constraintEnd_toStartOf="@+id/windoo_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/baro_title_tv" />
+
+    <ToggleButton
+        android:id="@+id/windoo_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="92dp"
+        android:layout_marginTop="8dp"
+        android:text="ToggleButton"
+        android:textAllCaps="false"
+        android:textOff="Start"
+        android:textOn="Stop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/baro_btn"
+        app:layout_constraintTop_toBottomOf="@+id/windoo_title_tv" />
+
+    <TextView
+        android:id="@+id/baro_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="52dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Smartphone Barometer"
+        app:layout_constraintEnd_toStartOf="@+id/windoo_title_tv"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/windoo_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Windoo Sensor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/baro_title_tv"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/api_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:text="Weather API"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/height_title_tv" />
+
+    <Spinner
+        android:id="@+id/api_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintStart_toEndOf="@+id/api_title_tv"
+        app:layout_constraintTop_toBottomOf="@+id/height_title_tv" />
+
+    <Button
+        android:id="@+id/call_service_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:text="Calibrate"
+        android:textAllCaps="false"
+        app:layout_constraintStart_toEndOf="@+id/calibration_pressure_tv"
+        app:layout_constraintTop_toBottomOf="@+id/api_title_tv" />
+
+    <TextView
+        android:id="@+id/pressure_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:text="Pressure: "
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/baro_btn" />
+
+    <TextView
+        android:id="@+id/pressure_baro_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:text="\?"
+        app:layout_constraintStart_toEndOf="@+id/pressure_title_tv"
+        app:layout_constraintTop_toBottomOf="@+id/baro_btn" />
+
+    <TextView
+        android:id="@+id/pressure_windoo_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="32dp"
+        android:text="\?"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/windoo_btn" />
+
+    <TextView
+        android:id="@+id/height_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:text="Height: "
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/formula_title_tv" />
+
+    <TextView
+        android:id="@+id/height_baro_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:text="\?"
+        app:layout_constraintStart_toEndOf="@+id/height_title_tv"
+        app:layout_constraintTop_toBottomOf="@+id/formula_title_tv" />
+
+    <TextView
+        android:id="@+id/height_windoo_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="32dp"
+        android:text="\?"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/formula_title_tv" />
+
+    <TextView
+        android:id="@+id/calibration_temperature_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="Temperature from service: "
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/service_response_title" />
+
+    <TextView
+        android:id="@+id/calibration_temp_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="\?"
+        app:layout_constraintStart_toEndOf="@+id/calibration_temperature_title"
+        app:layout_constraintTop_toBottomOf="@+id/service_response_title" />
 
 </android.support.constraint.ConstraintLayout>
