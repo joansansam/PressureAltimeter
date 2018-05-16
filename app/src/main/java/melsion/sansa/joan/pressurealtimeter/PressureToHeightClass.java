@@ -14,7 +14,7 @@ public class PressureToHeightClass {
     public static double R=8.3144598;
 
     public static double calculate(String formula, double P, double P0, double T) {
-        double h = 8888;
+        double h;
         double Tk = T + 273.15;
 
         switch (formula) {
@@ -69,6 +69,9 @@ public class PressureToHeightClass {
             case Constants.WEATHER_GOV:
                 //https://www.weather.gov/media/epz/wxcalc/pressureAltitude.pdf
                 h = (1 - pow(P/P0,0.190284)) * 145366.45 * 0.3048;
+                break;
+            default:
+                h = SensorManager.getAltitude((float) P0, (float) P);
                 break;
 
         }
