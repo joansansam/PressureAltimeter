@@ -1,5 +1,7 @@
 package melsion.sansa.joan.pressurealtimeter;
 
+import java.text.DecimalFormat;
+
 public class Constants {
     ////////////////////Variables////////////////////////
     //Services
@@ -21,6 +23,7 @@ public class Constants {
     //Values
     public final static double STANDARD_PRESSURE=1013.25;
     public final static double STANDARD_TEMPERATURE=20;
+    public final static DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
 
     //////////////////////SharedPreferences Keys///////////////////
     public final static String SELECTED_SERVICE = "selected_service";

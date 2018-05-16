@@ -207,9 +207,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public void updatePressureUI(double sensorValue, double windooValue){
         if(sensorValue == 0){
-            pressureWindooTV.setText(String.valueOf(windooValue));
+            pressureWindooTV.setText(Constants.DECIMAL_FORMAT.format(windooValue));
         } else if(windooValue == 0){
-            pressureBaroTV.setText(String.valueOf(sensorValue));
+            pressureBaroTV.setText(Constants.DECIMAL_FORMAT.format(sensorValue));
         }
     }
 
@@ -220,9 +220,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public void updateHeightUI(double sensorValue, double windooValue){
         if(sensorValue == 0){
-            heightWindooTV.setText(String.valueOf(windooValue));
+            heightWindooTV.setText(Constants.DECIMAL_FORMAT.format(windooValue));
         } else if(windooValue == 0){
-            heightBaroTV.setText(String.valueOf(sensorValue));
+            heightBaroTV.setText(Constants.DECIMAL_FORMAT.format(windooValue));
         }
     }
 
