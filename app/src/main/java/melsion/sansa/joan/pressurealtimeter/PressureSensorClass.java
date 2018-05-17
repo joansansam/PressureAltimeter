@@ -65,7 +65,7 @@ public class PressureSensorClass {
     private void averaging(double value) {
         acum += value;
         n++;
-        if (n == 25) { //For every 25 measurements, get the average
+        if (n == 25) { //For every 25 measurements, get the average //ToDo: calculate how many samples must be averaged
             average = acum / n;
 
             //To check measures, save them to a file
@@ -73,7 +73,7 @@ public class PressureSensorClass {
 
             activity.updatePressureUI(average, 0);
 
-            String formula = SharedPreferencesUtils.getString(context,Constants.SELECTED_FORMULA,Constants.ANDROID_SENSORMANAGER);
+            String formula = SharedPreferencesUtils.getString(context,Constants.SELECTED_FORMULA,"");
             double P0 = Double.valueOf(SharedPreferencesUtils.getString(context,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
             double T = Double.valueOf(SharedPreferencesUtils.getString(context,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE)));
             double height = PressureToHeightClass.calculate(formula, average, P0,T);

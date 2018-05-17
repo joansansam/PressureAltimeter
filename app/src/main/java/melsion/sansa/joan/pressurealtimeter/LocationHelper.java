@@ -1,7 +1,6 @@
 package melsion.sansa.joan.pressurealtimeter;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.location.Location;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,7 +45,10 @@ public class LocationHelper {
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
     private void createLocationCallback(){
-        //SharedPreferencesUtils.setBoolean(activity,Constants.GPS_BUSY,true);
+
+        if(mLocationCallback!=null){
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        }
 
         //Aqui no entrará nunca si no se tiene la ubicacion activada
         mLocationCallback = new LocationCallback() {

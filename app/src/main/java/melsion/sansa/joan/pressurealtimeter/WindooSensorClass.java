@@ -58,7 +58,7 @@ public class WindooSensorClass implements Observer {
                     //Send values to UI
                     activity.updatePressureUI(0, pressureValue);
 
-                    String formula = SharedPreferencesUtils.getString(activity,Constants.SELECTED_FORMULA,Constants.ANDROID_SENSORMANAGER);
+                    String formula = SharedPreferencesUtils.getString(activity,Constants.SELECTED_FORMULA,"");
                     double P0 = Double.valueOf(SharedPreferencesUtils.getString(activity,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
                     double T = Double.valueOf(SharedPreferencesUtils.getString(activity,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE)));
                     double height = PressureToHeightClass.calculate(formula, pressureValue, P0,T);

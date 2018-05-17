@@ -1,11 +1,21 @@
 package melsion.sansa.joan.pressurealtimeter;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Button callServiceButton;
     private Spinner apiSpinner, formulaSpinner;
 
+    private double sensorPressure, windooPressure;
     private String selectedService;
 
     //--------------------------------------------------------------------------
@@ -60,31 +71,25 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     // The toggle is enabled
-                    //Check audio permissions in order to use Windoo jack sensor.
                     // https://stackoverflow.com/questions/28539717/android-startrecording-called-on-an-uninitialized-audiorecord-when-samplerate/28539778
-                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},123);
-                    }
-                    else {
-                        //Instantiate jdcWindooManager and start observing sensor changes
-                        if (windooSensorClass == null) {
-                            windooSensorClass = new WindooSensorClass(MainActivity.this);
-                            windooSensorClass.start();
+                    //Instantiate jdcWindooManager and start observing sensor changes
+                    if (windooSensorClass == null) {
+                        //ToDo: check volume is max
+                        windooSensorClass = new WindooSensorClass(MainActivity.this);
+                        windooSensorClass.start();
 
-                            //If any of the sensors have not been initialized, create the file to store the measurements
-                        /*if(pressureSensorClass == null){
-                            FileUtil.createFile(getApplicationContext());
-                        }*/
-                        }
+                        //If any of the sensors have not been initialized, create the file to store the measurements
+                    /*if(pressureSensorClass == null){
+                        FileUtil.createFile(getApplicationContext());
+                    }*/
                     }
                 } else {
                     // The toggle is disabled
                     //Liberate sensor listeners
                     if (windooSensorClass !=null) {
                         windooSensorClass.stop();
+                        windooSensorClass=null;
                     }
-                    windooSensorClass=null;
                 }
             }
         });
@@ -109,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
                     //Liberate sensor listeners
                     if(pressureSensorClass!=null) {
                         pressureSensorClass.stop();
+                        pressureSensorClass=null;
                     }
-                    pressureSensorClass=null;
                 }
             }
         });
@@ -118,23 +123,48 @@ public class MainActivity extends AppCompatActivity {
         callServiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Make the action only if permission is granted
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(MainActivity.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},321);
-                }
-                else {
-                    if(selectedService.equals(Constants.DEFAULT)) {
+                if(selectedService.equals(Constants.DEFAULT)) {
+                    SharedPreferencesUtils.setString(MainActivity.this, Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
+                    calibrationPressureTV.setText(String.valueOf(Constants.STANDARD_PRESSURE));
+                    SharedPreferencesUtils.setString(MainActivity.this, Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
+                    calibrationTempTV.setText(String.valueOf(Constants.STANDARD_TEMPERATURE));
+
+                    receiveFromService(String.valueOf(Constants.STANDARD_PRESSURE), String.valueOf(Constants.STANDARD_TEMPERATURE));
+                } else {
+                    //ToDo: start AlarmManager to calibrate every X minutes
+                    boolean neededConfig = checkGPSandConnection();
+                    if (neededConfig) {
+                        new LocationHelper(MainActivity.this);
+                    } else {
+                        //Show dialog
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                        alertDialogBuilder.setTitle("GPS and Internet connection required")
+                                .setMessage("You must enable Location and have Internet connection to procedure.")
+                                .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //Open permissions settings
+                                        Intent intent = new Intent(Settings.ACTION_SETTINGS);
+                                        startActivityForResult(intent,0);
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                })
+                                .setCancelable(false)
+                                .create()
+                                .show();
+
+                        //Use standard pressure and temperature if gps is not enabled
                         SharedPreferencesUtils.setString(MainActivity.this, Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
                         calibrationPressureTV.setText(String.valueOf(Constants.STANDARD_PRESSURE));
                         SharedPreferencesUtils.setString(MainActivity.this, Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
                         calibrationTempTV.setText(String.valueOf(Constants.STANDARD_TEMPERATURE));
-                    } else {
-                        new LocationHelper(MainActivity.this);
                     }
                 }
-                //ToDo: maybe show dialog if GPS not enabled.
             }
         });
 
@@ -181,6 +211,17 @@ public class MainActivity extends AppCompatActivity {
                                                android.view.View v, int position, long id) {
                         String formula = (String)parent.getItemAtPosition(position);
                         SharedPreferencesUtils.setString(MainActivity.this, Constants.SELECTED_FORMULA, formula);
+
+                        double P0 = Double.valueOf(SharedPreferencesUtils.getString(MainActivity.this,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
+                        double T = Double.valueOf(SharedPreferencesUtils.getString(MainActivity.this,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE)));
+                        double sensorHeight = PressureToHeightClass.calculate(formula, sensorPressure, P0,T);
+                        double windooHeight = PressureToHeightClass.calculate(formula, windooPressure, P0,T);
+                        if(sensorPressure != 0) {
+                            updateHeightUI(sensorHeight, 0);
+                        }
+                        if(windooPressure != 0){
+                            updateHeightUI(0, windooHeight);
+                        }
                     }
 
                     public void onNothingSelected(AdapterView<?> parent) {
@@ -189,11 +230,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        //ToDo: gestionar millor permisos i config (volum, internet i gps)
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},123);
-        }
+        checkPermissions();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        checkPermissions();
     }
 
     //--------------------------------------------------------------------------
@@ -206,10 +249,12 @@ public class MainActivity extends AppCompatActivity {
      * @param windooValue
      */
     public void updatePressureUI(double sensorValue, double windooValue){
-        if(sensorValue == 0){
-            pressureWindooTV.setText(Constants.DECIMAL_FORMAT.format(windooValue));
-        } else if(windooValue == 0){
+        if(sensorValue != 0){
+            sensorPressure= sensorValue;
             pressureBaroTV.setText(Constants.DECIMAL_FORMAT.format(sensorValue));
+        } else if(windooValue != 0){
+            windooPressure= windooValue;
+            pressureWindooTV.setText(Constants.DECIMAL_FORMAT.format(windooValue));
         }
     }
 
@@ -219,15 +264,91 @@ public class MainActivity extends AppCompatActivity {
      * @param windooValue
      */
     public void updateHeightUI(double sensorValue, double windooValue){
-        if(sensorValue == 0){
+        if(sensorValue != 0){
+            heightBaroTV.setText(Constants.DECIMAL_FORMAT.format(sensorValue));
+        } else if(windooValue != 0){
             heightWindooTV.setText(Constants.DECIMAL_FORMAT.format(windooValue));
-        } else if(windooValue == 0){
-            heightBaroTV.setText(Constants.DECIMAL_FORMAT.format(windooValue));
         }
     }
 
     public void receiveFromService(String pressureString, String temperatureString){
         calibrationPressureTV.setText(pressureString);
         calibrationTempTV.setText(temperatureString);
+
+        String formula = SharedPreferencesUtils.getString(MainActivity.this, Constants.SELECTED_FORMULA,"");
+        double P0 = Double.valueOf(SharedPreferencesUtils.getString(MainActivity.this,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
+        double T = Double.valueOf(SharedPreferencesUtils.getString(MainActivity.this,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE)));
+        double sensorHeight = PressureToHeightClass.calculate(formula, sensorPressure, P0,T);
+        double windooHeight = PressureToHeightClass.calculate(formula, windooPressure, P0,T);
+        if(sensorPressure != 0) {
+            updateHeightUI(sensorHeight, 0);
+        }
+        if(windooPressure != 0){
+            updateHeightUI(0, windooHeight);
+        }
     }
+
+    //--------------------------------------------------------------------------
+    // OTHERS
+    //--------------------------------------------------------------------------
+
+    private void checkPermissions(){
+        //From here https://stackoverflow.com/questions/30719047/android-m-check-runtime-permission-how-to-determine-if-the-user-checked-nev/35495893#35495893
+        //Check all permissions in a row
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.RECORD_AUDIO) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) ) {
+
+                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                alertDialogBuilder.setTitle("Permissions Required")
+                        .setMessage("You have forcefully denied some of the required permissions " +
+                                "for the app. Please open settings, go to permissions and allow them.")
+                        .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //Open permissions settings
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                        Uri.fromParts("package", getPackageName(), null));
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivityForResult(intent,10);
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                checkPermissions();
+                            }
+                        })
+                        .setCancelable(false)
+                        .create()
+                        .show();
+
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
+            }
+        }
+    }
+
+    private boolean checkGPSandConnection(){
+        Context context = MainActivity.this;
+        LocationManager service = (LocationManager) context.getSystemService(LOCATION_SERVICE);
+
+        ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        boolean enabled = activeNetwork != null && activeNetwork.isConnectedOrConnecting() //Internet connection
+                && service.isProviderEnabled(LocationManager.GPS_PROVIDER); //GPS enabled
+
+        if(!enabled)
+        {
+            Log.e("Location", "Internet or GPS is not activated.");
+        }
+        return enabled;
+    }
+
 }
+

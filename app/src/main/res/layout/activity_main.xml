@@ -208,4 +208,6 @@
         app:layout_constraintStart_toEndOf="@+id/calibration_temperature_title"
         app:layout_constraintTop_toBottomOf="@+id/service_response_title" />
 
+    <!--ToDo: put a 20º checkbox-->
+
 </android.support.constraint.ConstraintLayout>

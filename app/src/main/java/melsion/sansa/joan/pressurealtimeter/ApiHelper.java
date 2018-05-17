@@ -1,10 +1,8 @@
 package melsion.sansa.joan.pressurealtimeter;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -101,8 +99,8 @@ public class ApiHelper {
     }
 
     private void updateUI(JSONObject responseJson){
-        String pressureValue = "0.0";
-        String temperature = "0.0";
+        String pressureValue="?";
+        String temperature="?";
         try {
             if(urlString.contains("openweathermap")) {
                 pressureValue = responseJson.getJSONObject("main").getString("pressure");
