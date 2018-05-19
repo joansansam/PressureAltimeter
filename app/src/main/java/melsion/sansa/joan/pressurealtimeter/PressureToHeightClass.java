@@ -1,5 +1,6 @@
 package melsion.sansa.joan.pressurealtimeter;
 
+import android.content.Context;
 import android.hardware.SensorManager;
 
 import static java.lang.Math.exp;
@@ -13,7 +14,11 @@ public class PressureToHeightClass {
     public static double g=9.80665;
     public static double R=8.3144598;
 
-    public static double calculate(String formula, double P, double P0, double T) {
+    public static double calculate(Context context, double P) {
+        String formula = SharedPreferencesUtils.getString(context,Constants.SELECTED_FORMULA,"");
+        double P0 = Double.valueOf(SharedPreferencesUtils.getString(context,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
+        double T = Double.valueOf(SharedPreferencesUtils.getString(context,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE)));
+
         double h;
         double Tk = T + 273.15;
 

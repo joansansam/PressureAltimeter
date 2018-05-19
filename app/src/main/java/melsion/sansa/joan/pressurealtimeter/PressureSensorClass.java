@@ -53,7 +53,8 @@ public class PressureSensorClass {
                 pressureValue = (double) event.values[0];
 
                 //To check measures, save them to a file (Try to not use this value, TOO MUCH OVERFLOW IN THE LOG FILE)
-                //FileUtil.saveToFile(0,pressureValue,0);
+                double height = PressureToHeightClass.calculate(context, pressureValue);
+                FileUtil.saveToFile(height,0,0);
 
                 //Averaging and sending to UI and file
                 averaging(pressureValue);
@@ -65,18 +66,16 @@ public class PressureSensorClass {
     private void averaging(double value) {
         acum += value;
         n++;
-        if (n == 25) { //For every 25 measurements, get the average //ToDo: calculate how many samples must be averaged
+        if (n == 24) { //For every 24 measurements (4 seconds), get the average //ToDo: calculate how many samples must be averaged
             average = acum / n;
-
-            //To check measures, save them to a file
-            //FileUtil.saveToFile(0,average,0);
 
             activity.updatePressureUI(average, 0);
 
-            String formula = SharedPreferencesUtils.getString(context,Constants.SELECTED_FORMULA,"");
-            double P0 = Double.valueOf(SharedPreferencesUtils.getString(context,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
-            double T = Double.valueOf(SharedPreferencesUtils.getString(context,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE)));
-            double height = PressureToHeightClass.calculate(formula, average, P0,T);
+            double height = PressureToHeightClass.calculate(context, average);
+
+            //To check measures, save them to a file
+            FileUtil.saveToFile(0,height,0);
+
             activity.updateHeightUI(height,0);
 
             n = 0;

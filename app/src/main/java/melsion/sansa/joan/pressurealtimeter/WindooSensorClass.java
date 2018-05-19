@@ -52,16 +52,14 @@ public class WindooSensorClass implements Observer {
                     //If temperature is needed for calibration:
                     double temperature= measurement.getTemperature();
 
-                    //To check measures, save them to a file
-                    //FileUtil.saveToFile(temperature,0,pressureEvent);
-
                     //Send values to UI
                     activity.updatePressureUI(0, pressureValue);
 
-                    String formula = SharedPreferencesUtils.getString(activity,Constants.SELECTED_FORMULA,"");
-                    double P0 = Double.valueOf(SharedPreferencesUtils.getString(activity,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
-                    double T = Double.valueOf(SharedPreferencesUtils.getString(activity,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE)));
-                    double height = PressureToHeightClass.calculate(formula, pressureValue, P0,T);
+                    double height = PressureToHeightClass.calculate(activity.getApplicationContext(), pressureValue);
+
+                    //To check measures, save them to a file
+                    FileUtil.saveToFile(0,0,height);
+
                     activity.updateHeightUI(0, height);
                 }
             }

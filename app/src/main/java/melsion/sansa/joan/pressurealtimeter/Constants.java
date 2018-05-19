@@ -30,4 +30,5 @@ public class Constants {
     public final static String SELECTED_FORMULA = "selected_formula";
     public final static String CALIBRATION_PRESSURE = "calibration_pressure";
     public final static String CALIBRATION_TEMPERATURE = "calibration_temperature";
+    public final static String TEMP_CHECKED = "temp_checked";
 }

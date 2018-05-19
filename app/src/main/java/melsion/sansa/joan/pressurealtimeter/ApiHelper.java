@@ -119,11 +119,13 @@ public class ApiHelper {
                 temperature = String.valueOf(convertedTemp);
             }
 
-            Toast.makeText(activity.getApplicationContext(), "Pressure from service="+pressureValue, Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getApplicationContext(), "Received from service: pressure="+pressureValue+" temperature= 0"+temperature, Toast.LENGTH_SHORT).show();
 
-            SharedPreferencesUtils.setString(activity, Constants.CALIBRATION_PRESSURE, pressureValue);
-            SharedPreferencesUtils.setString(activity, Constants.CALIBRATION_TEMPERATURE, temperature);
-
+            SharedPreferencesUtils.setString(activity.getApplicationContext(), Constants.CALIBRATION_PRESSURE, pressureValue);
+            boolean tempChecked = SharedPreferencesUtils.getBoolean(activity.getApplicationContext(), Constants.TEMP_CHECKED,false);
+            if(!tempChecked) {
+                SharedPreferencesUtils.setString(activity.getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, temperature);
+            }
             //Send value to UI
             activity.receiveFromService(pressureValue,temperature);
 

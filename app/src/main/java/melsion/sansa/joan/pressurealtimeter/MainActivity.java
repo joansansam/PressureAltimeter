@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private ToggleButton windooButton, barometerButton;
     private Button callServiceButton;
     private Spinner apiSpinner, formulaSpinner;
+    private CheckBox tempCheckBox;
 
     private double sensorPressure, windooPressure;
     private String selectedService;
@@ -61,30 +64,51 @@ public class MainActivity extends AppCompatActivity {
         apiSpinner = findViewById(R.id.api_spinner);
         formulaSpinner = findViewById(R.id.formula_spinner);
         calibrationTempTV = findViewById(R.id.calibration_temp_tv);
+        tempCheckBox = findViewById(R.id.temp_checkbox);
 
         String calibrationPressure = SharedPreferencesUtils.getString(this, Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE));
         String calibrationTemp = SharedPreferencesUtils.getString(this, Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE));
         calibrationPressureTV.setText(calibrationPressure);
         calibrationTempTV.setText(calibrationTemp);
+        windooButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean buttonIsChecked = windooButton.isChecked();
+                if(buttonIsChecked){
+                    //Check that the jack volume is the maximum
+                    final int VOLUME_STREAM= AudioManager.STREAM_MUSIC;
+                    AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    int maxVolume = audio.getStreamMaxVolume(VOLUME_STREAM);
+                    int currentVolume = audio.getStreamVolume(VOLUME_STREAM);
+                    if(maxVolume==currentVolume || !audio.isVolumeFixed()){
+                        //Set volume to the maximum
+                        audio.setStreamVolume(VOLUME_STREAM, maxVolume, 0);
+                        // https://stackoverflow.com/questions/28539717/android-startrecording-called-on-an-uninitialized-audiorecord-when-samplerate/28539778
+                        //Instantiate jdcWindooManager and start observing sensor changes
+                        if (windooSensorClass == null) {
+                            windooSensorClass = new WindooSensorClass(MainActivity.this);
+                            windooSensorClass.start();
 
-        windooButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    // The toggle is enabled
-                    // https://stackoverflow.com/questions/28539717/android-startrecording-called-on-an-uninitialized-audiorecord-when-samplerate/28539778
-                    //Instantiate jdcWindooManager and start observing sensor changes
-                    if (windooSensorClass == null) {
-                        //ToDo: check volume is max
-                        windooSensorClass = new WindooSensorClass(MainActivity.this);
-                        windooSensorClass.start();
+                            //If any of the sensors have not been initialized, create the file to store the measurements
+                            if(pressureSensorClass == null){
+                                FileUtil.createFile(getApplicationContext());
+                            }
+                        }
+                    } else {
+                        //Show dialog
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                        alertDialogBuilder.setTitle("Audio volume must be maximum")
+                                .setMessage("You must turn up the volume.")
+                                /*.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
 
-                        //If any of the sensors have not been initialized, create the file to store the measurements
-                    /*if(pressureSensorClass == null){
-                        FileUtil.createFile(getApplicationContext());
-                    }*/
+                                    }
+                                })*/
+                                .create()
+                                .show();
                     }
-                } else {
-                    // The toggle is disabled
+                } else{
                     //Liberate sensor listeners
                     if (windooSensorClass !=null) {
                         windooSensorClass.stop();
@@ -93,6 +117,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        /*windooButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {// The toggle is enabled
+
+                } else {// The toggle is disabled
+
+                }
+            }
+        });*/
 
         barometerButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -104,9 +138,9 @@ public class MainActivity extends AppCompatActivity {
                         pressureSensorClass.start();
 
                         //If any of the sensors have not been initialized, create the file to store the measurements
-                        /*if(windooSensorClass == null){
+                        if(windooSensorClass == null){
                             FileUtil.createFile(getApplicationContext());
-                        }*/
+                        }
                     }
 
                 } else {
@@ -131,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
 
                     receiveFromService(String.valueOf(Constants.STANDARD_PRESSURE), String.valueOf(Constants.STANDARD_TEMPERATURE));
                 } else {
-                    //ToDo: start AlarmManager to calibrate every X minutes
+                    //ToDo: start AlarmManager to calibrate every X minutes - NOT THAT OBVIOUS (maybe it must only calibrate at the starting point)
                     boolean neededConfig = checkGPSandConnection();
                     if (neededConfig) {
                         new LocationHelper(MainActivity.this);
@@ -212,10 +246,8 @@ public class MainActivity extends AppCompatActivity {
                         String formula = (String)parent.getItemAtPosition(position);
                         SharedPreferencesUtils.setString(MainActivity.this, Constants.SELECTED_FORMULA, formula);
 
-                        double P0 = Double.valueOf(SharedPreferencesUtils.getString(MainActivity.this,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
-                        double T = Double.valueOf(SharedPreferencesUtils.getString(MainActivity.this,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE)));
-                        double sensorHeight = PressureToHeightClass.calculate(formula, sensorPressure, P0,T);
-                        double windooHeight = PressureToHeightClass.calculate(formula, windooPressure, P0,T);
+                        double sensorHeight = PressureToHeightClass.calculate(getApplicationContext(), sensorPressure);
+                        double windooHeight = PressureToHeightClass.calculate(getApplicationContext(), windooPressure);
                         if(sensorPressure != 0) {
                             updateHeightUI(sensorHeight, 0);
                         }
@@ -230,6 +262,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+        tempCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferencesUtils.setBoolean(MainActivity.this,Constants.TEMP_CHECKED, tempCheckBox.isChecked());
+                if(tempCheckBox.isChecked()){
+                    SharedPreferencesUtils.setString(MainActivity.this,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
+                }
+            }
+        });
+
         checkPermissions();
     }
 
@@ -237,6 +279,17 @@ public class MainActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
         checkPermissions();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        //Liberate sensor listeners when closing app
+        pressureSensorClass.stop();
+        windooSensorClass.stop();
+        pressureSensorClass=null;
+        windooSensorClass=null;
+        FileUtil.closeOutputStream();
     }
 
     //--------------------------------------------------------------------------
@@ -275,11 +328,8 @@ public class MainActivity extends AppCompatActivity {
         calibrationPressureTV.setText(pressureString);
         calibrationTempTV.setText(temperatureString);
 
-        String formula = SharedPreferencesUtils.getString(MainActivity.this, Constants.SELECTED_FORMULA,"");
-        double P0 = Double.valueOf(SharedPreferencesUtils.getString(MainActivity.this,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
-        double T = Double.valueOf(SharedPreferencesUtils.getString(MainActivity.this,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE)));
-        double sensorHeight = PressureToHeightClass.calculate(formula, sensorPressure, P0,T);
-        double windooHeight = PressureToHeightClass.calculate(formula, windooPressure, P0,T);
+        double sensorHeight = PressureToHeightClass.calculate(getApplicationContext(), sensorPressure);
+        double windooHeight = PressureToHeightClass.calculate(getApplicationContext(), windooPressure);
         if(sensorPressure != 0) {
             updateHeightUI(sensorHeight, 0);
         }
