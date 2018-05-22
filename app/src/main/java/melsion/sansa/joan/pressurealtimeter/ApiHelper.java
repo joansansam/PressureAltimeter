@@ -1,6 +1,7 @@
 package melsion.sansa.joan.pressurealtimeter;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -22,9 +23,11 @@ public class ApiHelper {
     private JSONObject serviceResponseJson=null;
     private MainActivity activity;
     private String urlString="";
+    private Context context;
 
     public JSONObject selectService(MainActivity activity, String service, double lat, double lon){
         this.activity = activity;
+        this.context = activity.getApplicationContext();
 
         switch (service) {
             case Constants.ACCUWEATHER:
@@ -116,18 +119,23 @@ public class ApiHelper {
                 pressureValue = responseJson.getJSONObject("currently").getString("pressure");
                 String temperatureString = responseJson.getJSONObject("currently").getString("temperature");
                 double convertedTemp= 5*(Double.valueOf(temperatureString)-32)/9;
-                temperature = String.valueOf(convertedTemp);
+                temperature = Constants.DECIMAL_FORMAT.format(convertedTemp);
             }
 
-            Toast.makeText(activity.getApplicationContext(), "Received from service: pressure="+pressureValue+" temperature= 0"+temperature, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Received from service: pressure="+pressureValue+" temperature= "+temperature, Toast.LENGTH_SHORT).show();
+            FileUtil.saveToFile("Calibrated:"+pressureValue+"-"+temperature,"","");
 
-            SharedPreferencesUtils.setString(activity.getApplicationContext(), Constants.CALIBRATION_PRESSURE, pressureValue);
-            boolean tempChecked = SharedPreferencesUtils.getBoolean(activity.getApplicationContext(), Constants.TEMP_CHECKED,false);
+            SharedPreferencesUtils.setString(context, Constants.CALIBRATION_PRESSURE, pressureValue);
+            SharedPreferencesUtils.setString(context,Constants.SERVICE_TEMPERATURE, temperature);
+            boolean tempChecked = SharedPreferencesUtils.getBoolean(context, Constants.TEMP_CHECKED,false);
             if(!tempChecked) {
-                SharedPreferencesUtils.setString(activity.getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, temperature);
+                SharedPreferencesUtils.setString(context, Constants.CALIBRATION_TEMPERATURE, temperature);
+                //Send value to UI
+                activity.receiveFromService(pressureValue,temperature);
+            } else {
+                activity.receiveFromService(pressureValue, String.valueOf(Constants.STANDARD_TEMPERATURE));
             }
-            //Send value to UI
-            activity.receiveFromService(pressureValue,temperature);
+
 
         } catch (JSONException e) {
             e.printStackTrace();

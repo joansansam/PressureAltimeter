@@ -54,7 +54,7 @@ public class PressureSensorClass {
 
                 //To check measures, save them to a file (Try to not use this value, TOO MUCH OVERFLOW IN THE LOG FILE)
                 double height = PressureToHeightClass.calculate(context, pressureValue);
-                FileUtil.saveToFile(height,0,0);
+                //FileUtil.saveToFile(height,"","");
 
                 //Averaging and sending to UI and file
                 averaging(pressureValue);
@@ -66,7 +66,7 @@ public class PressureSensorClass {
     private void averaging(double value) {
         acum += value;
         n++;
-        if (n == 24) { //For every 24 measurements (4 seconds), get the average //ToDo: calculate how many samples must be averaged
+        if (n == 6*8) { //For every 48 measurements (8 seconds), get the average //ToDo: calculate how many samples must be averaged
             average = acum / n;
 
             activity.updatePressureUI(average, 0);
@@ -74,7 +74,7 @@ public class PressureSensorClass {
             double height = PressureToHeightClass.calculate(context, average);
 
             //To check measures, save them to a file
-            FileUtil.saveToFile(0,height,0);
+            FileUtil.saveToFile("",String.valueOf(height),"");
 
             activity.updateHeightUI(height,0);
 

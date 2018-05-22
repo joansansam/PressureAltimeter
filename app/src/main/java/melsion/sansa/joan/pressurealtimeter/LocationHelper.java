@@ -1,6 +1,7 @@
 package melsion.sansa.joan.pressurealtimeter;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.location.Location;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -22,6 +23,7 @@ public class LocationHelper {
     private Location location;
     private double latitude, longitude;
     private MainActivity activity;
+    private Context context;
 
     /**
      * Start location services
@@ -29,6 +31,7 @@ public class LocationHelper {
     @SuppressLint("MissingPermission")
     public LocationHelper(MainActivity activity){
         this.activity=activity;
+        this.context= activity.getApplicationContext();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
         createLocationRequest();
         createLocationCallback();
@@ -62,7 +65,7 @@ public class LocationHelper {
                 mFusedLocationClient.removeLocationUpdates(mLocationCallback);
 
                 //Get selected service
-                String selectedService = SharedPreferencesUtils.getString(activity,Constants.SELECTED_SERVICE,"");
+                String selectedService = SharedPreferencesUtils.getString(context,Constants.SELECTED_SERVICE,"");
 
                 //Run API call
                 ApiHelper apiHelper = new ApiHelper();

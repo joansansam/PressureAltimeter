@@ -17,6 +17,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -66,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         calibrationTempTV = findViewById(R.id.calibration_temp_tv);
         tempCheckBox = findViewById(R.id.temp_checkbox);
 
+        FileUtil.createFile(getApplicationContext());
+
         String calibrationPressure = SharedPreferencesUtils.getString(this, Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE));
         String calibrationTemp = SharedPreferencesUtils.getString(this, Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE));
         calibrationPressureTV.setText(calibrationPressure);
@@ -88,23 +92,18 @@ public class MainActivity extends AppCompatActivity {
                         if (windooSensorClass == null) {
                             windooSensorClass = new WindooSensorClass(MainActivity.this);
                             windooSensorClass.start();
-
-                            //If any of the sensors have not been initialized, create the file to store the measurements
-                            if(pressureSensorClass == null){
-                                FileUtil.createFile(getApplicationContext());
-                            }
                         }
                     } else {
                         //Show dialog
-                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
                         alertDialogBuilder.setTitle("Audio volume must be maximum")
                                 .setMessage("You must turn up the volume.")
-                                /*.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                .setNegativeButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
 
                                     }
-                                })*/
+                                })
                                 .create()
                                 .show();
                     }
@@ -136,11 +135,6 @@ public class MainActivity extends AppCompatActivity {
                     if(pressureSensorClass == null) {
                         pressureSensorClass = new PressureSensorClass(MainActivity.this);
                         pressureSensorClass.start();
-
-                        //If any of the sensors have not been initialized, create the file to store the measurements
-                        if(windooSensorClass == null){
-                            FileUtil.createFile(getApplicationContext());
-                        }
                     }
 
                 } else {
@@ -158,11 +152,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(selectedService.equals(Constants.DEFAULT)) {
-                    SharedPreferencesUtils.setString(MainActivity.this, Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
+                    SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
                     calibrationPressureTV.setText(String.valueOf(Constants.STANDARD_PRESSURE));
-                    SharedPreferencesUtils.setString(MainActivity.this, Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
+                    SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
                     calibrationTempTV.setText(String.valueOf(Constants.STANDARD_TEMPERATURE));
 
+                    FileUtil.saveToFile("Calibrated:"+SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE))
+                            +"-"+SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE))
+                            ,"","");
                     receiveFromService(String.valueOf(Constants.STANDARD_PRESSURE), String.valueOf(Constants.STANDARD_TEMPERATURE));
                 } else {
                     //ToDo: start AlarmManager to calibrate every X minutes - NOT THAT OBVIOUS (maybe it must only calibrate at the starting point)
@@ -171,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                         new LocationHelper(MainActivity.this);
                     } else {
                         //Show dialog
-                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
                         alertDialogBuilder.setTitle("GPS and Internet connection required")
                                 .setMessage("You must enable Location and have Internet connection to procedure.")
                                 .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
@@ -193,9 +190,9 @@ public class MainActivity extends AppCompatActivity {
                                 .show();
 
                         //Use standard pressure and temperature if gps is not enabled
-                        SharedPreferencesUtils.setString(MainActivity.this, Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
+                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
                         calibrationPressureTV.setText(String.valueOf(Constants.STANDARD_PRESSURE));
-                        SharedPreferencesUtils.setString(MainActivity.this, Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
+                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
                         calibrationTempTV.setText(String.valueOf(Constants.STANDARD_TEMPERATURE));
                     }
                 }
@@ -215,12 +212,12 @@ public class MainActivity extends AppCompatActivity {
                 new AdapterView.OnItemSelectedListener() {
                     public void onItemSelected(AdapterView<?> parent,android.view.View v, int position, long id) {
                         selectedService = (String)parent.getItemAtPosition(position);
-                        SharedPreferencesUtils.setString(MainActivity.this, Constants.SELECTED_SERVICE,selectedService);
+                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.SELECTED_SERVICE,selectedService);
                     }
 
                     public void onNothingSelected(AdapterView<?> parent) {
                         selectedService = (String)parent.getItemAtPosition(0);
-                        SharedPreferencesUtils.setString(MainActivity.this, Constants.SELECTED_SERVICE,selectedService);
+                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.SELECTED_SERVICE,selectedService);
                     }
                 });
 
@@ -244,7 +241,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onItemSelected(AdapterView<?> parent,
                                                android.view.View v, int position, long id) {
                         String formula = (String)parent.getItemAtPosition(position);
-                        SharedPreferencesUtils.setString(MainActivity.this, Constants.SELECTED_FORMULA, formula);
+                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.SELECTED_FORMULA, formula);
+
+                        FileUtil.saveToFile("selectedFormula="+formula.replace(" ","_"),"","");
 
                         double sensorHeight = PressureToHeightClass.calculate(getApplicationContext(), sensorPressure);
                         double windooHeight = PressureToHeightClass.calculate(getApplicationContext(), windooPressure);
@@ -258,17 +257,26 @@ public class MainActivity extends AppCompatActivity {
 
                     public void onNothingSelected(AdapterView<?> parent) {
                         String formula = (String)parent.getItemAtPosition(0);
-                        SharedPreferencesUtils.setString(MainActivity.this, Constants.SELECTED_FORMULA, formula);
+                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.SELECTED_FORMULA, formula);
                     }
                 });
 
         tempCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferencesUtils.setBoolean(MainActivity.this,Constants.TEMP_CHECKED, tempCheckBox.isChecked());
+                SharedPreferencesUtils.setBoolean(getApplicationContext(),Constants.TEMP_CHECKED, tempCheckBox.isChecked());
                 if(tempCheckBox.isChecked()){
-                    SharedPreferencesUtils.setString(MainActivity.this,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
+                    SharedPreferencesUtils.setString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
                 }
+                else{
+                    String serviceTemp= SharedPreferencesUtils.getString(getApplicationContext(),Constants.SERVICE_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE));
+                    SharedPreferencesUtils.setString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE, serviceTemp);
+                }
+
+                String calibrationPressure = SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE));
+                String calibrationTemp= SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE));
+                FileUtil.saveToFile("Calibrated:"+calibrationPressure+"-"+calibrationTemp,"","");
+                receiveFromService(calibrationPressure, calibrationTemp);
             }
         });
 
@@ -285,12 +293,33 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy(){
         super.onDestroy();
         //Liberate sensor listeners when closing app
-        pressureSensorClass.stop();
-        windooSensorClass.stop();
-        pressureSensorClass=null;
-        windooSensorClass=null;
+        if(pressureSensorClass != null) {
+            pressureSensorClass.stop();
+            pressureSensorClass=null;
+        }
+        if(windooSensorClass != null) {
+            windooSensorClass.stop();
+            windooSensorClass = null;
+        }
         FileUtil.closeOutputStream();
     }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.dev_menu, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case R.id.item:
+                startActivity(new Intent(this, LogActivity.class));
+                break;
+        }
+        return true;
+    }
+
 
     //--------------------------------------------------------------------------
     // UI METHODS
@@ -345,9 +374,9 @@ public class MainActivity extends AppCompatActivity {
     private void checkPermissions(){
         //From here https://stackoverflow.com/questions/30719047/android-m-check-runtime-permission-how-to-determine-if-the-user-checked-nev/35495893#35495893
         //Check all permissions in a row
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(MainActivity.this,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.RECORD_AUDIO) ||
                     ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) ||
@@ -384,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean checkGPSandConnection(){
-        Context context = MainActivity.this;
+        Context context = getApplicationContext();
         LocationManager service = (LocationManager) context.getSystemService(LOCATION_SERVICE);
 
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);

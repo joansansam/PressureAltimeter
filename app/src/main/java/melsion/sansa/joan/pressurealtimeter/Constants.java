@@ -1,6 +1,9 @@
 package melsion.sansa.joan.pressurealtimeter;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class Constants {
     ////////////////////Variables////////////////////////
@@ -23,12 +26,15 @@ public class Constants {
     //Values
     public final static double STANDARD_PRESSURE=1013.25;
     public final static double STANDARD_TEMPERATURE=20;
-    public final static DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+    //public final static NumberFormat DECIMAL_FORMAT = NumberFormat.getInstance(Locale.ENGLISH);//TODO
+    private static DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.ENGLISH);
+    public final static DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0"+symbols.getDecimalSeparator()+"00");
 
     //////////////////////SharedPreferences Keys///////////////////
     public final static String SELECTED_SERVICE = "selected_service";
     public final static String SELECTED_FORMULA = "selected_formula";
     public final static String CALIBRATION_PRESSURE = "calibration_pressure";
     public final static String CALIBRATION_TEMPERATURE = "calibration_temperature";
+    public final static String SERVICE_TEMPERATURE = "service_temperature";
     public final static String TEMP_CHECKED = "temp_checked";
 }

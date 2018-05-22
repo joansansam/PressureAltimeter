@@ -16,8 +16,9 @@ public class FileUtil {
     private static double fromWindooAux;
 
     public static void createFile(Context context){
-        if(!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
+        if(!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             return;
+        }
 
         //Save file to ...\Phone\Android\data\melsion.sansa.joan.pressurealtimeter\files
         File file = new File(context.getExternalFilesDir(null)
@@ -64,7 +65,7 @@ public class FileUtil {
 
     //This method writes the raw data
 
-    public static void saveToFile(double baroHeight, double baroAvg, double fromWindoo){
+    public static void saveToFile(String baroHeight, String baroAvg, String fromWindoo){
         try {
             String date = DateFormat.format("dd/MM/yyyy-HH:mm:ss", new java.util.Date()).toString();
 

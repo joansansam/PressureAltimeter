@@ -1,5 +1,6 @@
 package melsion.sansa.joan.pressurealtimeter;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.util.Observable;
@@ -18,9 +19,11 @@ import ch.skywatch.windoo.api.JDCWindooMeasurement;
 public class WindooSensorClass implements Observer {
     private JDCWindooManager jdcWindooManager;
     private MainActivity activity;
+    private Context context;
 
     public WindooSensorClass(MainActivity activity){
         this.activity=activity;
+        this.context = activity.getApplicationContext();
         this.jdcWindooManager = JDCWindooManager.getInstance();
     }
 
@@ -55,10 +58,10 @@ public class WindooSensorClass implements Observer {
                     //Send values to UI
                     activity.updatePressureUI(0, pressureValue);
 
-                    double height = PressureToHeightClass.calculate(activity.getApplicationContext(), pressureValue);
+                    double height = PressureToHeightClass.calculate(context, pressureValue);
 
                     //To check measures, save them to a file
-                    FileUtil.saveToFile(0,0,height);
+                    FileUtil.saveToFile("","",String.valueOf(height));
 
                     activity.updateHeightUI(0, height);
                 }
