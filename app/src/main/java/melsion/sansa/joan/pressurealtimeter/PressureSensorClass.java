@@ -5,6 +5,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
+
+import java.util.Arrays;
 
 /**
  * Created by joan.sansa.melsion on 18/04/2018.
@@ -62,11 +65,11 @@ public class PressureSensorClass {
         }
     };
 
-    //This method averages between each X (25) input values
-    private void averaging(double value) {
+    //This method averages between each "AVG_WINDOW" input values
+    /*private void averaging(double value) {
         acum += value;
         n++;
-        if (n == 6*8) { //For every 48 measurements (8 seconds), get the average //ToDo: calculate how many samples must be averaged
+        if (n == AVG_WINDOW) { //For every 48 measurements (8 seconds), get the average //ToDo: calculate how many samples must be averaged
             average = acum / n;
 
             activity.updatePressureUI(average, 0);
@@ -81,6 +84,36 @@ public class PressureSensorClass {
             n = 0;
             acum = 0;
             average = 0;
+        }
+    }*/
+
+    private final static int AVG_WINDOW = 6*8;
+    private double[] values = new double[AVG_WINDOW];
+    private int pos=0;
+    //Using median
+    //https://stackoverflow.com/questions/11955728/how-to-calculate-the-median-of-an-array
+    private void averaging(double value){
+        if(pos < AVG_WINDOW) {
+            values[pos] = value;
+            pos++;
+        } else {
+            pos=0;
+
+            double median;
+            Arrays.sort(values);
+            int middle = values.length/2;
+            if((values.length % 2) == 0) {
+                double left = values[middle - 1];
+                double right = values[middle];
+                median = (left + right)/2;
+            } else {
+                median = values[middle];
+            }
+
+            activity.updatePressureUI(median, 0);
+            double height = PressureToHeightClass.calculate(context, median);
+            FileUtil.saveToFile("",String.valueOf(height),"");
+            activity.updateHeightUI(height,0);
         }
     }
 }
