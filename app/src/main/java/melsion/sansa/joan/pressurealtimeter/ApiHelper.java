@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Locale;
 
 /**
  * Created by joan.sansa.melsion on 24/04/2018.
@@ -119,7 +120,7 @@ public class ApiHelper {
                 pressureValue = responseJson.getJSONObject("currently").getString("pressure");
                 String temperatureString = responseJson.getJSONObject("currently").getString("temperature");
                 double convertedTemp= 5*(Double.valueOf(temperatureString)-32)/9;
-                temperature = Constants.DECIMAL_FORMAT.format(convertedTemp);
+                temperature = String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT, convertedTemp);
             }
 
             Toast.makeText(context, "Received from service: pressure="+pressureValue+" temperature= "+temperature, Toast.LENGTH_SHORT).show();

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.media.AudioManager;
@@ -28,6 +29,8 @@ import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -269,8 +272,11 @@ public class MainActivity extends AppCompatActivity {
                     SharedPreferencesUtils.setString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
                 }
                 else{
-                    String serviceTemp= SharedPreferencesUtils.getString(getApplicationContext(),Constants.SERVICE_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE));
-                    SharedPreferencesUtils.setString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE, serviceTemp);
+                    String selectedService = SharedPreferencesUtils.getString(getApplicationContext(),Constants.SELECTED_SERVICE,Constants.DEFAULT);
+                    if(!selectedService.equals(Constants.DEFAULT)) {
+                        String serviceTemp = SharedPreferencesUtils.getString(getApplicationContext(), Constants.SERVICE_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
+                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, serviceTemp);
+                    }
                 }
 
                 String calibrationPressure = SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE));
@@ -333,10 +339,10 @@ public class MainActivity extends AppCompatActivity {
     public void updatePressureUI(double sensorValue, double windooValue){
         if(sensorValue != 0){
             sensorPressure= sensorValue;
-            pressureBaroTV.setText(Constants.DECIMAL_FORMAT.format(sensorValue));
+            pressureBaroTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,sensorValue));
         } else if(windooValue != 0){
             windooPressure= windooValue;
-            pressureWindooTV.setText(Constants.DECIMAL_FORMAT.format(windooValue));
+            pressureWindooTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,windooValue));
         }
     }
 
@@ -347,9 +353,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public void updateHeightUI(double sensorValue, double windooValue){
         if(sensorValue != 0){
-            heightBaroTV.setText(Constants.DECIMAL_FORMAT.format(sensorValue));
+            heightBaroTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,sensorValue));
         } else if(windooValue != 0){
-            heightWindooTV.setText(Constants.DECIMAL_FORMAT.format(windooValue));
+            heightWindooTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,windooValue));
         }
     }
 
