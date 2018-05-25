@@ -1,5 +1,10 @@
 package melsion.sansa.joan.pressurealtimeter;
 
+/**
+ * Created by joan.sansa.melsion on 14/05/2018.
+ * https://github.com/joansansam/PressureAltimeter
+ */
+
 public class Constants {
     ////////////////////Variables////////////////////////
     //Services

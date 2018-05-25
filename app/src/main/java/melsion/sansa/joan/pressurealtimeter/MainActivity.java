@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.media.AudioManager;
@@ -31,6 +30,11 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.util.Locale;
+
+/**
+ * Created by joan.sansa.melsion on 05/05/2018.
+ * https://github.com/joansansam/PressureAltimeter
+ */
 
 public class MainActivity extends AppCompatActivity {
 
@@ -313,6 +317,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.dev_menu, menu);
+        menu.getItem(R.id.item).setTitle("Logs");
+        menu.getItem(R.id.invisible_item).setVisible(false); //To recycle menu
         return true;
     }
     

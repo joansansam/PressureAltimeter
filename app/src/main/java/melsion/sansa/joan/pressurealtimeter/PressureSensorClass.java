@@ -11,6 +11,8 @@ import java.util.Arrays;
 
 /**
  * Created by joan.sansa.melsion on 18/04/2018.
+ * https://github.com/joansansam/PressureAltimeter
+ * References:
  * http://developer.samsung.com/technical-doc/view.do;jsessionid=1EAF2428DFF919537C6594B261B24A49?v=T000000127
  */
 
@@ -56,7 +58,7 @@ public class PressureSensorClass {
                 pressureValue = (double) event.values[0];
 
                 //To check measures, save them to a file (Try to not use this value, TOO MUCH OVERFLOW IN THE LOG FILE)
-                double height = PressureToHeightClass.calculate(context, pressureValue);
+                //double height = PressureToHeightClass.calculate(context, pressureValue);
                 //FileUtil.saveToFile(height,"","");
 
                 //Averaging and sending to UI and file
@@ -69,7 +71,7 @@ public class PressureSensorClass {
     /*private void averaging(double value) {
         acum += value;
         n++;
-        if (n == AVG_WINDOW) { //For every 48 measurements (8 seconds), get the average //ToDo: calculate how many samples must be averaged
+        if (n == AVG_WINDOW) { //For every AVG_WINDOW measurements (AVG_TIME_SECONDS seconds), get the average
             average = acum / n;
 
             activity.updatePressureUI(average, 0);
@@ -87,13 +89,37 @@ public class PressureSensorClass {
         }
     }*/
 
-    private final static int AVG_WINDOW = 6*8;
+    private final static int AVG_TIME_SECONDS = 4; //ToDo: check best window length
+    private final static int AVG_WINDOW = 6*AVG_TIME_SECONDS;
     private double[] values = new double[AVG_WINDOW];
     private int pos=0;
-    //Using median
+    //Using sliding window median
     //https://stackoverflow.com/questions/11955728/how-to-calculate-the-median-of-an-array
     private void averaging(double value){
-        if(pos < AVG_WINDOW) {
+        System.arraycopy(values,0,values,1,AVG_WINDOW-1); //Slide window
+        values[0]=value;
+
+        if(values[values.length-1]!=0) { //Start with median when the window is filled
+            double median;
+            double[] ordered = values.clone(); //Copy array
+            Arrays.sort(ordered); //order from small to large
+            int middle = ordered.length / 2;
+            if ((ordered.length % 2) == 0) {
+                double left = ordered[middle - 1];
+                double right = ordered[middle];
+                median = (left + right) / 2;
+            } else {
+                median = ordered[middle];
+            }
+
+            activity.updatePressureUI(median, 0);
+            double height = PressureToHeightClass.calculate(context, median);
+            FileUtil.saveToFile("", String.valueOf(height), "");
+            activity.updateHeightUI(height, 0);
+        }
+
+        //fixed window median
+        /*if(pos < AVG_WINDOW) {
             values[pos] = value;
             pos++;
         } else {
@@ -114,7 +140,7 @@ public class PressureSensorClass {
             double height = PressureToHeightClass.calculate(context, median);
             FileUtil.saveToFile("",String.valueOf(height),"");
             activity.updateHeightUI(height,0);
-        }
+        }*/
     }
 }
 

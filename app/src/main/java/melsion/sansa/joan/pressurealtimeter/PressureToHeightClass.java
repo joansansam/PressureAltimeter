@@ -7,6 +7,11 @@ import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import static java.lang.Math.pow;
 
+/**
+ * Created by joan.sansa.melsion on 14/05/2018.
+ * https://github.com/joansansam/PressureAltimeter
+ */
+
 public class PressureToHeightClass {
     //CONSTANTS
     public static double L=0.0065; //https://en.wikipedia.org/wiki/International_Standard_Atmosphere

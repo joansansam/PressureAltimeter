@@ -11,10 +11,10 @@ import ch.skywatch.windoo.api.JDCWindooManager;
 import ch.skywatch.windoo.api.JDCWindooMeasurement;
 
 /**
- * Created by joan.sansa.melsion on 18/04/2018.
+ * Created by joan.sansa.melsion on 18/04/2018. *
+ * https://github.com/joansansam/PressureAltimeter
  * https://gist.github.com/jdc-electronic/4eb9b585bf27e5a222da
  */
-
 
 public class WindooSensorClass implements Observer {
     private JDCWindooManager jdcWindooManager;

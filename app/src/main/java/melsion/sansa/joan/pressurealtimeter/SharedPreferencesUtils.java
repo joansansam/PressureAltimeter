@@ -2,6 +2,12 @@ package melsion.sansa.joan.pressurealtimeter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+/**
+ * Created by joan.sansa.melsion on 14/05/2018.
+ * https://github.com/joansansam/PressureAltimeter
+ */
+
 public class SharedPreferencesUtils {
 
     public static void setString(Context context, String key, String value){

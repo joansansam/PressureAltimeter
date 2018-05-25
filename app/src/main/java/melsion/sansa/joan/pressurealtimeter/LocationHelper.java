@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 /**
  * Created by joan.sansa.melsion on 03/05/2018.
+ * https://github.com/joansansam/PressureAltimeter
  */
 public class LocationHelper {
 

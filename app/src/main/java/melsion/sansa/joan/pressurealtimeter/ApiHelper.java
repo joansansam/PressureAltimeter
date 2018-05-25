@@ -17,6 +17,7 @@ import java.util.Locale;
 
 /**
  * Created by joan.sansa.melsion on 24/04/2018.
+ * https://github.com/joansansam/PressureAltimeter
  */
 
 public class ApiHelper {

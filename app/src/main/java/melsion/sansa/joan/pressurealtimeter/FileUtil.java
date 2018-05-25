@@ -9,6 +9,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * Created by joan.sansa.melsion on 19/05/2018.
+ * https://github.com/joansansam/PressureAltimeter
+ */
+
 public class FileUtil {
 
     private static FileOutputStream stream;
