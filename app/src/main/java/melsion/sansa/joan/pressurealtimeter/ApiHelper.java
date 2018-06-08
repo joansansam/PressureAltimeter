@@ -125,7 +125,7 @@ public class ApiHelper {
             }
 
             Toast.makeText(context, "Received from service: pressure="+pressureValue+" temperature= "+temperature, Toast.LENGTH_SHORT).show();
-            FileUtil.saveToFile("Calibrated:"+pressureValue+"-"+temperature,"","");
+            FileUtil.addToFile("Calibrated:"+pressureValue+"-"+temperature,"","");
 
             SharedPreferencesUtils.setString(context, Constants.CALIBRATION_PRESSURE, pressureValue);
             SharedPreferencesUtils.setString(context,Constants.SERVICE_TEMPERATURE, temperature);

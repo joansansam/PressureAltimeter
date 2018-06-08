@@ -1,21 +1,15 @@
 package melsion.sansa.joan.pressurealtimeter;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
-/**
- * Created by joan.sansa.melsion on 22/05/2018.
- * https://github.com/joansansam/PressureAltimeter
- */
 
 public class LogActivity extends AppCompatActivity {
 
@@ -30,38 +24,32 @@ public class LogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("Logs");
         logTV = findViewById(R.id.log_tv);
 
-        String logs = readFile();
+        String logs = FileUtil.getStringLogs();
         logTV.setText(logs);
-
-        //ToDo: send logs by mail
-
-        //ToDo: save logs with an unique name (to not overwrite file)
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.dev_menu, menu);
-        menu.getItem(R.id.item).setTitle("Send by mail");
-        menu.getItem(R.id.invisible_item).setVisible(true);
+        getMenuInflater().inflate(R.menu.logs_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
-            case R.id.item:
-                //ToDo: start sending email intent
+            case R.id.save_item:
+                FileUtil.saveFile(this);
                 break;
+            case R.id.send_item:
+                sendFileByMail();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
         return true;
     }
@@ -70,27 +58,14 @@ public class LogActivity extends AppCompatActivity {
     // OTHERS
     //--------------------------------------------------------------------------
 
-    private String readFile(){
-        //Get the text file
-        File file = new File(getExternalFilesDir(null),"altimeter_logs.csv");
-
-        //Read text from file
-        StringBuilder text = new StringBuilder();
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                text.append(line);
-                text.append('\n');
-            }
-            br.close();
-            return text.toString();
-        }
-        catch (IOException e) {
-            Log.e("LogActivity",e.getMessage());
-            return "";
-        }
+    public void sendFileByMail(){
+        String fileName = Constants.FILE_NAME+Constants.FILE_EXTENSION;
+        File file = new File(getExternalFilesDir(null),fileName);
+        Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name)+": "+fileName);
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {getString(R.string.author_email)});
+        emailIntent.setType("*/*");
+        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        startActivity(Intent.createChooser(emailIntent, "Send mail..."));
     }
 }

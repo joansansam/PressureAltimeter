@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                     SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
                     calibrationTempTV.setText(String.valueOf(Constants.STANDARD_TEMPERATURE));
 
-                    FileUtil.saveToFile("Calibrated:"+SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE))
+                    FileUtil.addToFile("Calibrated:"+SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE))
                             +"-"+SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE))
                             ,"","");
                     receiveFromService(String.valueOf(Constants.STANDARD_PRESSURE), String.valueOf(Constants.STANDARD_TEMPERATURE));
@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
                         String formula = (String)parent.getItemAtPosition(position);
                         SharedPreferencesUtils.setString(getApplicationContext(), Constants.SELECTED_FORMULA, formula);
 
-                        FileUtil.saveToFile("selectedFormula="+formula.replace(" ","_"),"","");
+                        FileUtil.addToFile("selectedFormula="+formula.replace(" ","_"),"","");
 
                         double sensorHeight = PressureToHeightClass.calculate(getApplicationContext(), sensorPressure);
                         double windooHeight = PressureToHeightClass.calculate(getApplicationContext(), windooPressure);
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
 
                 String calibrationPressure = SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE));
                 String calibrationTemp= SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE));
-                FileUtil.saveToFile("Calibrated:"+calibrationPressure+"-"+calibrationTemp,"","");
+                FileUtil.addToFile("Calibrated:"+calibrationPressure+"-"+calibrationTemp,"","");
                 receiveFromService(calibrationPressure, calibrationTemp);
             }
         });
@@ -316,9 +316,7 @@ public class MainActivity extends AppCompatActivity {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.dev_menu, menu);
-        menu.getItem(R.id.item).setTitle("Logs");
-        menu.getItem(R.id.invisible_item).setVisible(false); //To recycle menu
+        getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
     

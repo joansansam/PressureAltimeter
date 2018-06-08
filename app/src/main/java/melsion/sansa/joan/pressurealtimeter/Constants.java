@@ -29,6 +29,9 @@ public class Constants {
 
     public static final String DECIMAL_FORMAT = "%.2f";
 
+    public static final String FILE_NAME="altimeter_logs";
+    public static final String FILE_EXTENSION=".csv";
+
     //////////////////////SharedPreferences Keys///////////////////
     public final static String SELECTED_SERVICE = "selected_service";
     public final static String SELECTED_FORMULA = "selected_formula";

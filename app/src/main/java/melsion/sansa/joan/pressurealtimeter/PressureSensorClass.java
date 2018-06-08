@@ -5,7 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import java.util.Arrays;
 
@@ -59,7 +58,7 @@ public class PressureSensorClass {
 
                 //To check measures, save them to a file (Try to not use this value, TOO MUCH OVERFLOW IN THE LOG FILE)
                 //double height = PressureToHeightClass.calculate(context, pressureValue);
-                //FileUtil.saveToFile(height,"","");
+                //FileUtil.addToFile(height,"","");
 
                 //Averaging and sending to UI and file
                 averaging(pressureValue);
@@ -79,7 +78,7 @@ public class PressureSensorClass {
             double height = PressureToHeightClass.calculate(context, average);
 
             //To check measures, save them to a file
-            FileUtil.saveToFile("",String.valueOf(height),"");
+            FileUtil.addToFile("",String.valueOf(height),"");
 
             activity.updateHeightUI(height,0);
 
@@ -114,7 +113,7 @@ public class PressureSensorClass {
 
             activity.updatePressureUI(median, 0);
             double height = PressureToHeightClass.calculate(context, median);
-            FileUtil.saveToFile("", String.valueOf(height), "");
+            FileUtil.addToFile("", String.valueOf(height), "");
             activity.updateHeightUI(height, 0);
         }
 
@@ -138,7 +137,7 @@ public class PressureSensorClass {
 
             activity.updatePressureUI(median, 0);
             double height = PressureToHeightClass.calculate(context, median);
-            FileUtil.saveToFile("",String.valueOf(height),"");
+            FileUtil.addToFile("",String.valueOf(height),"");
             activity.updateHeightUI(height,0);
         }*/
     }

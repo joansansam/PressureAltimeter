@@ -61,7 +61,7 @@ public class WindooSensorClass implements Observer {
                     double height = PressureToHeightClass.calculate(context, pressureValue);
 
                     //To check measures, save them to a file
-                    FileUtil.saveToFile("","",String.valueOf(height));
+                    FileUtil.addToFile("","",String.valueOf(height));
 
                     activity.updateHeightUI(0, height);
                 }
