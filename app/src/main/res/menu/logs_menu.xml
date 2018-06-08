@@ -9,4 +9,8 @@
     <item android:id="@+id/save_item"
         android:title="SAVE"
         app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/restart_item"
+        android:title="Clear data and restart app"
+        app:showAsAction="never"/>
 </menu>

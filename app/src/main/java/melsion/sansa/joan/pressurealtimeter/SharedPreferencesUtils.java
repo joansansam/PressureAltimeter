@@ -70,4 +70,11 @@ public class SharedPreferencesUtils {
         return preferences.getLong(key,defaultValue);
     }
 
+    public static void clearSharedPreferences(Context context){
+        SharedPreferences preferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
+    }
+
 }
