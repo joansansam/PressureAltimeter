@@ -100,9 +100,11 @@ public class FileUtil {
      * https://www.androidcode.ninja/copy-or-move-file-from-one-directory-to/
      * @param context
      */
-    public static void saveFile(Context context){
-        String date = DateFormat.format("dd-MM-yyyy_HH:mm:ss", new java.util.Date()).toString();
-        String targetFileName = Constants.FILE_NAME+"_"+date+Constants.FILE_EXTENSION;
+    public static void saveFile(Context context, String fileName){
+        if(fileName.equals("")){
+            fileName="?";
+        }
+        String targetFileName= fileName+Constants.FILE_EXTENSION;
         File targetLocation = new File(context.getApplicationContext().getExternalFilesDir(null),targetFileName);
 
         try {

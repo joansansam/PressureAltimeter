@@ -7,8 +7,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.File;
@@ -45,7 +48,27 @@ public class LogActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
             case R.id.save_item:
-                FileUtil.saveFile(this);
+                final View customView = getLayoutInflater().inflate(R.layout.save_file_alertdialog,null);
+                final EditText editText = customView.findViewById(R.id.selected_name_et);
+                String date = DateFormat.format("dd-MM-yyyy_HH:mm:ss", new java.util.Date()).toString();
+                String defaultName = Constants.FILE_NAME+"_"+date;
+                editText.setText(defaultName);
+
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+                alertDialog.setTitle("Save logs file")
+                .setMessage("Select file name")
+                .setView(customView)
+                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String selectedName = editText.getText().toString();
+                        FileUtil.saveFile(getApplicationContext(),selectedName);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                })
+                .show();
                 break;
             case R.id.send_item:
                 sendFileByMail();

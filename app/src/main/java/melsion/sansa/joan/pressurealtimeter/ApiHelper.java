@@ -31,6 +31,7 @@ public class ApiHelper {
         this.activity = activity;
         this.context = activity.getApplicationContext();
 
+        //ToDo: controlar el màxim de calls per dia: 50 accuweather, 1000 darksky
         switch (service) {
             case Constants.ACCUWEATHER:
                 urlString = "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=TQcwTT9Mw9VMsXPuIKBtgJCjhLZDRh8e&q=" + lat + "%2C" + lon + "&details=false";
@@ -42,6 +43,7 @@ public class ApiHelper {
                 serviceCall();
                 break;
             case Constants.DARKSKY:
+                //ToDo: si acaba sent el service definitiu afegir powered by DarkSky https://darksky.net/dev/docs
                 urlString = "https://api.darksky.net/forecast/4f237579222e7fd80fa327b8c57c532d/" + lat + "," + lon;
                 serviceCall();
                 break;
@@ -87,17 +89,19 @@ public class ApiHelper {
 
             @Override
             protected void onPostExecute(Void result) {
-                if(urlString.contains("accuweather") && urlString.contains("locations")){
-                    try {
-                        String locationKey = serviceResponseJson.getString("Key");
-                        urlString="http://dataservice.accuweather.com/currentconditions/v1/"+locationKey+"?apikey=TQcwTT9Mw9VMsXPuIKBtgJCjhLZDRh8e&details=true";
-                        serviceCall();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Log.e("ApiHelper", e.getMessage());
+                if(serviceResponseJson != null) {
+                    if (urlString.contains("accuweather") && urlString.contains("locations")) {
+                        try {
+                            String locationKey = serviceResponseJson.getString("Key");
+                            urlString = "http://dataservice.accuweather.com/currentconditions/v1/" + locationKey + "?apikey=TQcwTT9Mw9VMsXPuIKBtgJCjhLZDRh8e&details=true";
+                            serviceCall();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.e("ApiHelper", e.getMessage());
+                        }
+                    } else {
+                        updateUI(serviceResponseJson);
                     }
-                } else {
-                    updateUI(serviceResponseJson);
                 }
             }
         }.execute();
