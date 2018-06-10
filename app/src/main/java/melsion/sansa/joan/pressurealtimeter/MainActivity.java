@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private Button callServiceButton;
     private Spinner apiSpinner, formulaSpinner;
     private CheckBox tempCheckBox;
+    private ProgressBar progressBar;
 
     private double sensorPressure, windooPressure;
     private String selectedService;
@@ -74,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
         formulaSpinner = findViewById(R.id.formula_spinner);
         calibrationTempTV = findViewById(R.id.calibration_temp_tv);
         tempCheckBox = findViewById(R.id.temp_checkbox);
+        progressBar = findViewById(R.id.progress_bar);
+        progressBar.bringToFront();
 
         FileUtil.createFile(getApplicationContext());
 
@@ -140,11 +144,18 @@ public class MainActivity extends AppCompatActivity {
                     // The toggle is enabled
                     //Start smartphone sensor listener
                     if(pressureSensorClass == null) {
+                        //Start progress bar
+                        progressBar.setProgress(0);
+                        progressBar.setVisibility(View.VISIBLE);
+
                         pressureSensorClass = new PressureSensorClass(MainActivity.this);
                         pressureSensorClass.start();
                     }
 
                 } else {
+                    //Stop progress bar
+                    progressBar.setVisibility(View.GONE);
+
                     // The toggle is disabled
                     //Liberate sensor listeners
                     if(pressureSensorClass!=null) {
@@ -172,6 +183,8 @@ public class MainActivity extends AppCompatActivity {
                     //ToDo: start AlarmManager to calibrate every X minutes - NOT THAT OBVIOUS (maybe it must only calibrate at the starting point)
                     boolean neededConfig = checkGPSandConnection();
                     if (neededConfig) {
+                        progressBar.setProgress(0);
+                        progressBar.setVisibility(View.VISIBLE);
                         new LocationHelper(MainActivity.this);
                     } else {
                         //Show dialog
@@ -357,6 +370,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public void updateHeightUI(double sensorValue, double windooValue){
         if(sensorValue != 0){
+            //Stop progress bar
+            progressBar.setVisibility(View.GONE);
+
             heightBaroTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,sensorValue));
         } else if(windooValue != 0){
             heightWindooTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,windooValue));
@@ -364,6 +380,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void receiveFromService(String pressureString, String temperatureString){
+        //Stop progress bar
+        progressBar.setVisibility(View.GONE);
+
         calibrationPressureTV.setText(pressureString);
         calibrationTempTV.setText(temperatureString);
 
