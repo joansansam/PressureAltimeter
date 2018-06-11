@@ -61,7 +61,13 @@ public class PressureSensorClass {
                 //FileUtil.addToFile(height,"","");
 
                 //Averaging and sending to UI and file
-                averaging(pressureValue);
+                //averaging(pressureValue);
+
+                //Without averaging
+                activity.updatePressureUI(pressureValue, 0);
+                double height = PressureToHeightClass.calculate(context, pressureValue);
+                FileUtil.addToFile("", String.valueOf(height), "");
+                activity.updateHeightUI(height, 0);
             }
         }
     };

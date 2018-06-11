@@ -34,7 +34,7 @@ public class FileUtil {
 
         try {
             outputStream = new FileOutputStream(file);
-            String sequence= "date instant_height averaged_height windoo_heigh \n";
+            String sequence= "date instant_height "+/*averaged_height windoo_heigh*/" \n";
             outputStream.write(sequence.getBytes());
 
         } catch (IOException e) {
@@ -105,7 +105,13 @@ public class FileUtil {
             fileName="?";
         }
         String targetFileName= fileName+Constants.FILE_EXTENSION;
-        File targetLocation = new File(context.getApplicationContext().getExternalFilesDir(null),targetFileName);
+        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), context.getString(R.string.app_name));
+        if(!folder.exists()){
+            if(!folder.mkdirs()){
+                folder = new File(context.getApplicationContext().getExternalFilesDir(null), "");
+            }
+        }
+        File targetLocation = new File(folder, targetFileName);
 
         try {
             InputStream in = new FileInputStream(file);
