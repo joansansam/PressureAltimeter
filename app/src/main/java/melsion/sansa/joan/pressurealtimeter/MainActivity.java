@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner apiSpinner, formulaSpinner;
     private CheckBox tempCheckBox;
     private ProgressBar progressBar;
+    private static AlertDialog permissionsAlertDialog;
 
     private double sensorPressure, windooPressure;
     private String selectedService;
@@ -401,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
     // OTHERS
     //--------------------------------------------------------------------------
 
-    public static void checkPermissions(final Activity activity){
+    public static boolean checkPermissions(final Activity activity){
         //From here https://stackoverflow.com/questions/30719047/android-m-check-runtime-permission-how-to-determine-if-the-user-checked-nev/35495893#35495893
         //Check all permissions in a row
         if (ActivityCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
@@ -416,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
                     ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ) {
 
                 final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
-                alertDialogBuilder.setTitle("Permissions Required")
+                permissionsAlertDialog = alertDialogBuilder.setTitle("Permissions Required")
                         .setMessage("You have forcefully denied some of the required permissions " +
                                 "for the app. Please open settings, go to permissions and allow them.")
                         .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
@@ -427,22 +428,34 @@ public class MainActivity extends AppCompatActivity {
                                         Uri.fromParts("package", activity.getApplicationContext().getPackageName(), null));
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 activity.startActivityForResult(intent,10);
+                                permissionsAlertDialog.dismiss();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                checkPermissions(activity);
+                                permissionsAlertDialog.dismiss();
+                                if (ActivityCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
+                                        ActivityCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                                        ActivityCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                                        ActivityCompat.checkSelfPermission(activity.getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                    checkPermissions(activity);
+                                }
                             }
                         })
                         .setCancelable(false)
-                        .create()
-                        .show();
+                        .create();
+                if(!permissionsAlertDialog.isShowing()) {
+                    permissionsAlertDialog.show();
+                }
 
             } else {
                 ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 123);
             }
+        }else{
+            return true; //Permission granted
         }
+        return false; //Permission denied
     }
 
     private boolean checkGPSandConnection(){

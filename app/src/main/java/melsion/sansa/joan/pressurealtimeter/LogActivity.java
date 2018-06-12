@@ -34,18 +34,20 @@ public class LogActivity extends AppCompatActivity {
         actionBar.setTitle("Logs");
         logTV = findViewById(R.id.log_tv);
 
-        MainActivity.checkPermissions(this);
-
-        //ToDo: NO VA. VEURE SI POSO UN IF
-
-        String logs = FileUtil.getStringLogs();
-        logTV.setText(logs);
+        //MainActivity.checkPermissions(this);
+        if(MainActivity.checkPermissions(this)) {
+            String logs = FileUtil.getStringLogs(getApplicationContext());
+            logTV.setText(logs);
+        }
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        MainActivity.checkPermissions(this);
+        if(MainActivity.checkPermissions(this)) {
+            String logs = FileUtil.getStringLogs(getApplicationContext());
+            logTV.setText(logs);
+        }
     }
 
     @Override
@@ -127,4 +129,5 @@ public class LogActivity extends AppCompatActivity {
                 .putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
         startActivity(Intent.createChooser(emailIntent, "Select email app..."));
     }
+
 }

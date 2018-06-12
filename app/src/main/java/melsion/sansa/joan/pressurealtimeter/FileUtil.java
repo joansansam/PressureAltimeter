@@ -28,6 +28,7 @@ public class FileUtil {
 
         //Save file to ...\Phone\Android\data\melsion.sansa.joan.pressurealtimeter\files
         file = new File(context.getExternalFilesDir(null),Constants.FILE_NAME+Constants.FILE_EXTENSION);
+        file = newFile(context.getApplicationContext());
 
         if(file.exists())
             file.delete();
@@ -135,8 +136,10 @@ public class FileUtil {
 
     }
 
-    public static String getStringLogs(){
+    public static String getStringLogs(Context context){
         //Read text from file
+        file = newFile(context.getApplicationContext());
+
         StringBuilder text = new StringBuilder();
 
         try {
@@ -154,6 +157,10 @@ public class FileUtil {
             Log.e("FileUtil",e.getMessage());
             return "";
         }
+    }
+
+    private static File newFile(Context context){
+        return new File(context.getExternalFilesDir(null),Constants.FILE_NAME+Constants.FILE_EXTENSION);
     }
 
 }
