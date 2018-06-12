@@ -1,10 +1,13 @@
 package melsion.sansa.joan.pressurealtimeter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import java.util.Arrays;
 
@@ -61,13 +64,7 @@ public class PressureSensorClass {
                 //FileUtil.addToFile(height,"","");
 
                 //Averaging and sending to UI and file
-                //averaging(pressureValue);
-
-                //Without averaging
-                activity.updatePressureUI(pressureValue, 0);
-                double height = PressureToHeightClass.calculate(context, pressureValue);
-                FileUtil.addToFile("", String.valueOf(height), "");
-                activity.updateHeightUI(height, 0);
+                averaging(pressureValue);
             }
         }
     };
@@ -101,51 +98,71 @@ public class PressureSensorClass {
     //Using sliding window median
     //https://stackoverflow.com/questions/11955728/how-to-calculate-the-median-of-an-array
     private void averaging(double value){
-        System.arraycopy(values,0,values,1,AVG_WINDOW-1); //Slide window
-        values[0]=value;
+        if(AVG_TIME_SECONDS == 0){
 
-        if(values[values.length-1]!=0) { //Start with median when the window is filled
-            double median;
-            double[] ordered = values.clone(); //Copy array
-            Arrays.sort(ordered); //order from small to large
-            int middle = ordered.length / 2;
-            if ((ordered.length % 2) == 0) {
-                double left = ordered[middle - 1];
-                double right = ordered[middle];
-                median = (left + right) / 2;
-            } else {
-                median = ordered[middle];
-            }
-
-            activity.updatePressureUI(median, 0);
-            double height = PressureToHeightClass.calculate(context, median);
+            //Without averaging
+            activity.updatePressureUI(pressureValue, 0);
+            double height = PressureToHeightClass.calculate(context, pressureValue);
             FileUtil.addToFile("", String.valueOf(height), "");
             activity.updateHeightUI(height, 0);
-        }
-
-        //fixed window median
-        /*if(pos < AVG_WINDOW) {
-            values[pos] = value;
-            pos++;
+            stopProgressBar(activity);
         } else {
-            pos=0;
 
-            double median;
-            Arrays.sort(values);
-            int middle = values.length/2;
-            if((values.length % 2) == 0) {
-                double left = values[middle - 1];
-                double right = values[middle];
-                median = (left + right)/2;
-            } else {
-                median = values[middle];
+            System.arraycopy(values, 0, values, 1, AVG_WINDOW - 1); //Slide window
+            values[0] = value;
+
+            if (values[values.length - 1] != 0) { //Start with median when the window is filled
+                double median;
+                double[] ordered = values.clone(); //Copy array
+                Arrays.sort(ordered); //order from small to large
+                int middle = ordered.length / 2;
+                if ((ordered.length % 2) == 0) {
+                    double left = ordered[middle - 1];
+                    double right = ordered[middle];
+                    median = (left + right) / 2;
+                } else {
+                    median = ordered[middle];
+                }
+
+                activity.updatePressureUI(median, 0);
+                double height = PressureToHeightClass.calculate(context, median);
+                FileUtil.addToFile("", String.valueOf(height), "");
+                activity.updateHeightUI(height, 0);
+                stopProgressBar(activity);
             }
 
-            activity.updatePressureUI(median, 0);
-            double height = PressureToHeightClass.calculate(context, median);
-            FileUtil.addToFile("",String.valueOf(height),"");
-            activity.updateHeightUI(height,0);
-        }*/
+            //fixed window median
+            /*if(pos < AVG_WINDOW) {
+                values[pos] = value;
+                pos++;
+            } else {
+                pos=0;
+
+                double median;
+                Arrays.sort(values);
+                int middle = values.length/2;
+                if((values.length % 2) == 0) {
+                    double left = values[middle - 1];
+                    double right = values[middle];
+                    median = (left + right)/2;
+                } else {
+                    median = values[middle];
+                }
+
+                activity.updatePressureUI(median, 0);
+                double height = PressureToHeightClass.calculate(context, median);
+                FileUtil.addToFile("",String.valueOf(height),"");
+                activity.updateHeightUI(height,0);
+            }*/
+        }
+    }
+
+    private void stopProgressBar(Activity activity){
+        ProgressBar sensorProgressBar = activity.findViewById(R.id.sensor_progress_bar);
+        //Stop progress bar
+        if(sensorProgressBar.getVisibility() != View.GONE) {
+            sensorProgressBar.setVisibility(View.GONE);
+        }
     }
 }
 

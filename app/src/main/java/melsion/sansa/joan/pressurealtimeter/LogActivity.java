@@ -34,7 +34,6 @@ public class LogActivity extends AppCompatActivity {
         actionBar.setTitle("Logs");
         logTV = findViewById(R.id.log_tv);
 
-        //MainActivity.checkPermissions(this);
         if(MainActivity.checkPermissions(this)) {
             String logs = FileUtil.getStringLogs(getApplicationContext());
             logTV.setText(logs);
@@ -65,6 +64,12 @@ public class LogActivity extends AppCompatActivity {
                 String date = DateFormat.format("dd-MM-yyyy_HH:mm:ss", new java.util.Date()).toString();
                 String defaultName = Constants.FILE_NAME+"_"+date;
                 editText.setText(defaultName);
+                editText.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        editText.setSelection(editText.getText().length()); //set cursor to end
+                    }
+                });
 
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
                 alertDialog.setTitle("Save logs file")

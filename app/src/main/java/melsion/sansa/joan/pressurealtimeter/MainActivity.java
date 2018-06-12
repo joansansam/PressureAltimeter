@@ -13,7 +13,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -51,7 +50,8 @@ public class MainActivity extends AppCompatActivity {
     private Button callServiceButton;
     private Spinner apiSpinner, formulaSpinner;
     private CheckBox tempCheckBox;
-    private ProgressBar progressBar;
+    private ProgressBar sensorProgressBar;
+    private ProgressBar serviceProgressBar;
     private static AlertDialog permissionsAlertDialog;
 
     private double sensorPressure, windooPressure;
@@ -78,8 +78,10 @@ public class MainActivity extends AppCompatActivity {
         formulaSpinner = findViewById(R.id.formula_spinner);
         calibrationTempTV = findViewById(R.id.calibration_temp_tv);
         tempCheckBox = findViewById(R.id.temp_checkbox);
-        progressBar = findViewById(R.id.progress_bar);
-        progressBar.bringToFront();
+        sensorProgressBar = findViewById(R.id.sensor_progress_bar);
+        serviceProgressBar = findViewById(R.id.service_progress_bar);
+        sensorProgressBar.bringToFront();
+        serviceProgressBar.bringToFront();
 
         FileUtil.createFile(getApplicationContext());
 
@@ -147,8 +149,10 @@ public class MainActivity extends AppCompatActivity {
                     //Start smartphone sensor listener
                     if(pressureSensorClass == null) {
                         //Start progress bar
-                        progressBar.setProgress(0);
-                        progressBar.setVisibility(View.VISIBLE);
+                        sensorProgressBar.setProgress(0);
+                        if(sensorProgressBar.getVisibility() != View.VISIBLE) {
+                            sensorProgressBar.setVisibility(View.VISIBLE);
+                        }
 
                         pressureSensorClass = new PressureSensorClass(MainActivity.this);
                         pressureSensorClass.start();
@@ -156,8 +160,9 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     //Stop progress bar
-                    progressBar.setVisibility(View.GONE);
-
+                    if(sensorProgressBar.getVisibility() != View.GONE) {
+                        sensorProgressBar.setVisibility(View.GONE);
+                    }
                     // The toggle is disabled
                     //Liberate sensor listeners
                     if(pressureSensorClass!=null) {
@@ -185,8 +190,10 @@ public class MainActivity extends AppCompatActivity {
                     //ToDo: start AlarmManager to calibrate every X minutes - NOT THAT OBVIOUS (maybe it must only calibrate at the starting point)
                     boolean neededConfig = checkGPSandConnection();
                     if (neededConfig) {
-                        progressBar.setProgress(0);
-                        progressBar.setVisibility(View.VISIBLE);
+                        serviceProgressBar.setProgress(0);
+                        if(serviceProgressBar.getVisibility() != View.VISIBLE) {
+                            serviceProgressBar.setVisibility(View.VISIBLE);
+                        }
                         new LocationHelper(MainActivity.this);
                     } else {
                         //Show dialog
@@ -372,9 +379,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public void updateHeightUI(double sensorValue, double windooValue){
         if(sensorValue != 0){
-            //Stop progress bar
-            progressBar.setVisibility(View.GONE);
-
             heightBaroTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,sensorValue));
         } else if(windooValue != 0){
             heightWindooTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,windooValue));
@@ -383,7 +387,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void receiveFromService(String pressureString, String temperatureString){
         //Stop progress bar
-        progressBar.setVisibility(View.GONE);
+        if(serviceProgressBar.getVisibility() != View.GONE) {
+            serviceProgressBar.setVisibility(View.GONE);
+        }
 
         calibrationPressureTV.setText(pressureString);
         calibrationTempTV.setText(temperatureString);
