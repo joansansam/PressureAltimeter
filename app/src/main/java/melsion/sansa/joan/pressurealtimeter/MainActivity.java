@@ -132,16 +132,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*windooButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {// The toggle is enabled
-
-                } else {// The toggle is disabled
-
-                }
-            }
-        });*/
-
         barometerButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -242,11 +232,27 @@ public class MainActivity extends AppCompatActivity {
                     public void onItemSelected(AdapterView<?> parent,android.view.View v, int position, long id) {
                         selectedService = (String)parent.getItemAtPosition(position);
                         SharedPreferencesUtils.setString(getApplicationContext(), Constants.SELECTED_SERVICE,selectedService);
+
+                        /*if(selectedService.equals(Constants.DEFAULT)){
+                            tempCheckBox.setChecked(true);
+                            tempCheckBox.setEnabled(false);
+                        } else {
+                            tempCheckBox.setChecked(false);
+                            tempCheckBox.setEnabled(true);
+                        }*/
                     }
 
                     public void onNothingSelected(AdapterView<?> parent) {
                         selectedService = (String)parent.getItemAtPosition(0);
                         SharedPreferencesUtils.setString(getApplicationContext(), Constants.SELECTED_SERVICE,selectedService);
+
+                        /*if(selectedService.equals(Constants.DEFAULT)){
+                            tempCheckBox.setChecked(true);
+                            tempCheckBox.setEnabled(false);
+                        } else {
+                            tempCheckBox.setChecked(false);
+                            tempCheckBox.setEnabled(true);
+                        }*/
                     }
                 });
 
@@ -260,6 +266,7 @@ public class MainActivity extends AppCompatActivity {
                 Constants.WIKIPEDIACAT2,
                 Constants.GEOPOTENTIAL_INVERSE,
                 Constants.METEOCAT,
+                Constants.METEOCAT_VAPOR,
                 Constants.WEATHER_GOV
         };
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, formulas);
@@ -274,6 +281,8 @@ public class MainActivity extends AppCompatActivity {
 
                         FileUtil.addToFile("selectedFormula="+formula.replace(" ","_"),"","");
 
+                        //enableCalibrations(formula);
+
                         double sensorHeight = PressureToHeightClass.calculate(getApplicationContext(), sensorPressure);
                         double windooHeight = PressureToHeightClass.calculate(getApplicationContext(), windooPressure);
                         if(sensorPressure != 0) {
@@ -287,6 +296,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onNothingSelected(AdapterView<?> parent) {
                         String formula = (String)parent.getItemAtPosition(0);
                         SharedPreferencesUtils.setString(getApplicationContext(), Constants.SELECTED_FORMULA, formula);
+
+                        //enableCalibrations(formula);
                     }
                 });
 
@@ -480,6 +491,35 @@ public class MainActivity extends AppCompatActivity {
         }
         return enabled;
     }
+
+    /*private void enableCalibrations(String formula){
+        //ToDo: check if it works and enable again when another formula.
+        //ToDo: arreglar
+        //Disable callibration controls when not needed
+        if(formula.equals(Constants.ANDROID_SENSORMANAGER)) {
+            apiSpinner.setEnabled(false);
+
+            tempCheckBox.setChecked(true);
+            tempCheckBox.setEnabled(false);
+
+            callServiceButton.setEnabled(false);
+        } else if(formula.equals(Constants.WEATHER_GOV)){
+            tempCheckBox.setChecked(true);
+            tempCheckBox.setEnabled(false);
+        } else {
+            apiSpinner.setEnabled(true);
+
+            if(service.equals(Constants.DEFAULT)){
+                tempCheckBox.setChecked(true);
+                tempCheckBox.setEnabled(false);
+            }else{
+                tempCheckBox.setChecked(false);
+                tempCheckBox.setEnabled(true);
+            }
+
+            callServiceButton.setEnabled(true);
+        }
+    }*/
 
 }
 

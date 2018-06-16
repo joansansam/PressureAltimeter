@@ -20,8 +20,9 @@ public class Constants {
     public final static String WIKIPEDIA2="Wikipedia2";
     public final static String WIKIPEDIACAT="WikipediaCAT";
     public final static String WIKIPEDIACAT2="WikipediaCAT2";
-    public final static String GEOPOTENTIAL_INVERSE="Geopotential-inverse";
+    public final static String GEOPOTENTIAL_INVERSE="Geopotential inverse";
     public final static String METEOCAT="Meteocat";
+    public final static String METEOCAT_VAPOR="Meteocat vapor";
     public final static String WEATHER_GOV="Weather.gov";
     //Values
     public final static double STANDARD_PRESSURE=1013.25;
