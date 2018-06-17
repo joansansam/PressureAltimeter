@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private ToggleButton windooButton, barometerButton;
     private Button callServiceButton;
     private Spinner apiSpinner, formulaSpinner;
-    private CheckBox tempCheckBox;
+    private CheckBox temp20CheckBox, temp15CheckBox;
     private ProgressBar sensorProgressBar;
     private ProgressBar serviceProgressBar;
     private static AlertDialog permissionsAlertDialog;
@@ -77,7 +77,8 @@ public class MainActivity extends AppCompatActivity {
         apiSpinner = findViewById(R.id.api_spinner);
         formulaSpinner = findViewById(R.id.formula_spinner);
         calibrationTempTV = findViewById(R.id.calibration_temp_tv);
-        tempCheckBox = findViewById(R.id.temp_checkbox);
+        temp20CheckBox = findViewById(R.id.temp_20_checkbox);
+        temp15CheckBox = findViewById(R.id.temp_15_checkbox);
         sensorProgressBar = findViewById(R.id.sensor_progress_bar);
         serviceProgressBar = findViewById(R.id.service_progress_bar);
         sensorProgressBar.bringToFront();
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         FileUtil.createFile(getApplicationContext());
 
         String calibrationPressure = SharedPreferencesUtils.getString(this, Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE));
-        String calibrationTemp = SharedPreferencesUtils.getString(this, Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE));
+        String calibrationTemp = SharedPreferencesUtils.getString(this, Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE_20));
         calibrationPressureTV.setText(calibrationPressure);
         calibrationTempTV.setText(calibrationTemp);
         windooButton.setOnClickListener(new View.OnClickListener() {
@@ -169,13 +170,13 @@ public class MainActivity extends AppCompatActivity {
                 if(selectedService.equals(Constants.DEFAULT)) {
                     SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
                     calibrationPressureTV.setText(String.valueOf(Constants.STANDARD_PRESSURE));
-                    SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
-                    calibrationTempTV.setText(String.valueOf(Constants.STANDARD_TEMPERATURE));
+                    SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE_15));
+                    calibrationTempTV.setText(String.valueOf(Constants.STANDARD_TEMPERATURE_20));
 
                     FileUtil.addToFile("Calibrated:"+SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE))
-                            +"-"+SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE))
+                            +"-"+SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE_15))
                             ,"","");
-                    receiveFromService(String.valueOf(Constants.STANDARD_PRESSURE), String.valueOf(Constants.STANDARD_TEMPERATURE));
+                    receiveFromService(String.valueOf(Constants.STANDARD_PRESSURE), String.valueOf(Constants.STANDARD_TEMPERATURE_15));
                 } else {
                     //ToDo: start AlarmManager to calibrate every X minutes - NOT THAT OBVIOUS (maybe it must only calibrate at the starting point)
                     boolean neededConfig = checkGPSandConnection();
@@ -211,8 +212,8 @@ public class MainActivity extends AppCompatActivity {
                         //Use standard pressure and temperature if gps is not enabled
                         SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
                         calibrationPressureTV.setText(String.valueOf(Constants.STANDARD_PRESSURE));
-                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
-                        calibrationTempTV.setText(String.valueOf(Constants.STANDARD_TEMPERATURE));
+                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE_20));
+                        calibrationTempTV.setText(String.valueOf(Constants.STANDARD_TEMPERATURE_20));
                     }
                 }
             }
@@ -301,25 +302,67 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        tempCheckBox.setOnClickListener(new View.OnClickListener() {
+        temp20CheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferencesUtils.setBoolean(getApplicationContext(),Constants.TEMP_CHECKED, tempCheckBox.isChecked());
-                if(tempCheckBox.isChecked()){
-                    SharedPreferencesUtils.setString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
+                SharedPreferencesUtils.setBoolean(getApplicationContext(),Constants.TEMP_CHECKED, temp20CheckBox.isChecked());
+                if(temp20CheckBox.isChecked()){
+                    temp15CheckBox.setChecked(false);
+                    SharedPreferencesUtils.setString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE_20));
                 }
                 else{
                     String selectedService = SharedPreferencesUtils.getString(getApplicationContext(),Constants.SELECTED_SERVICE,Constants.DEFAULT);
                     if(!selectedService.equals(Constants.DEFAULT)) {
-                        String serviceTemp = SharedPreferencesUtils.getString(getApplicationContext(), Constants.SERVICE_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
+                        String serviceTemp = SharedPreferencesUtils.getString(getApplicationContext(), Constants.SERVICE_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE_20));
                         SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, serviceTemp);
                     }
                 }
 
                 String calibrationPressure = SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE));
-                String calibrationTemp= SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE));
+                String calibrationTemp= SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE_20));
                 FileUtil.addToFile("Calibrated:"+calibrationPressure+"-"+calibrationTemp,"","");
-                receiveFromService(calibrationPressure, calibrationTemp);
+                //receiveFromService(calibrationPressure, calibrationTemp);
+
+                double sensorHeight = PressureToHeightClass.calculate(getApplicationContext(), sensorPressure);
+                double windooHeight = PressureToHeightClass.calculate(getApplicationContext(), windooPressure);
+                if(sensorPressure != 0) {
+                    updateHeightUI(sensorHeight, 0);
+                }
+                if(windooPressure != 0){
+                    updateHeightUI(0, windooHeight);
+                }
+            }
+        });
+
+        temp15CheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferencesUtils.setBoolean(getApplicationContext(),Constants.TEMP_CHECKED, temp15CheckBox.isChecked());
+                if(temp15CheckBox.isChecked()){
+                    temp20CheckBox.setChecked(false);
+                    SharedPreferencesUtils.setString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE_15));
+                }
+                else{
+                    String selectedService = SharedPreferencesUtils.getString(getApplicationContext(),Constants.SELECTED_SERVICE,Constants.DEFAULT);
+                    if(!selectedService.equals(Constants.DEFAULT)) {
+                        String serviceTemp = SharedPreferencesUtils.getString(getApplicationContext(), Constants.SERVICE_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE_15));
+                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, serviceTemp);
+                    }
+                }
+
+                String calibrationPressure = SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE));
+                String calibrationTemp= SharedPreferencesUtils.getString(getApplicationContext(),Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE_15));
+                FileUtil.addToFile("Calibrated:"+calibrationPressure+"-"+calibrationTemp,"","");
+                //receiveFromService(calibrationPressure, calibrationTemp);
+
+                double sensorHeight = PressureToHeightClass.calculate(getApplicationContext(), sensorPressure);
+                double windooHeight = PressureToHeightClass.calculate(getApplicationContext(), windooPressure);
+                if(sensorPressure != 0) {
+                    updateHeightUI(sensorHeight, 0);
+                }
+                if(windooPressure != 0){
+                    updateHeightUI(0, windooHeight);
+                }
             }
         });
 

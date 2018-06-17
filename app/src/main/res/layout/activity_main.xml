@@ -5,6 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <CheckBox
+        android:id="@+id/temp_15_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="Use 15ºC"
+        app:layout_constraintStart_toEndOf="@+id/temp_20_checkbox"
+        app:layout_constraintTop_toBottomOf="@+id/calibration_temperature_title" />
+
     <TextView
         android:id="@+id/service_response_title"
         android:layout_width="wrap_content"
@@ -209,7 +219,7 @@
         app:layout_constraintTop_toBottomOf="@+id/service_response_title" />
 
     <CheckBox
-        android:id="@+id/temp_checkbox"
+        android:id="@+id/temp_20_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

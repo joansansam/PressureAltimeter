@@ -26,7 +26,7 @@ public class PressureToHeightClass {
     public static double calculate(Context context, double P) {
         String formula = SharedPreferencesUtils.getString(context,Constants.SELECTED_FORMULA,"");
         double P0 = Double.valueOf(SharedPreferencesUtils.getString(context,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
-        double T = Double.valueOf(SharedPreferencesUtils.getString(context,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE)));
+        double T = Double.valueOf(SharedPreferencesUtils.getString(context,Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE_20)));
 
         double h;
         double Tk = T + 273.15;
@@ -77,11 +77,11 @@ public class PressureToHeightClass {
                 break;
             case Constants.METEOCAT_VAPOR:
                 //http://www.meteo.cat/wpweb/divulgacio/equipaments-meteorologics/estacions-meteorologiques-automatiques/xarxa-destacions-meteorologiques-automatiques-xema/informacio-sobre-les-dades-meteorologiques-de-les-ema-que-es-mostren-al-web/reduccio-de-la-pressio-atmosferica-a-un-nivell-de-referencia/
-                //Si l'alçada de l'estació està a menys de 1500m es refereix a 0m. Si no, a 1500m. ?? ToDo
+                //Si l'alçada de l'estació està a menys de 1500m es refereix a 0m. Si no, a 1500m. ??
                 //https://ca.wikipedia.org/wiki/Pressi%C3%B3_de_vapor_de_l%27aigua
                 double e = (exp(20.386 - (5132 / Tk))) * 1.33322387415;
                 //Compensació de la temperatura segons la pressió de vapor d'aigua (veure link meteocat)
-                Tk=Tk*(1+0.378*(e/P0)); //ToDo: comprovar si P o P0
+                Tk=Tk*(1+0.378*(e/P0));
                 h = ((1 - (pow(P0 / P,-Rd * L / g))) * (Tk / L)) + h0;
                 break;
             case Constants.WEATHER_GOV:

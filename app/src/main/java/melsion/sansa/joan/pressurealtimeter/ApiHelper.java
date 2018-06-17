@@ -139,7 +139,7 @@ public class ApiHelper {
                 //Send value to UI
                 activity.receiveFromService(pressureValue,temperature);
             } else {
-                activity.receiveFromService(pressureValue, String.valueOf(Constants.STANDARD_TEMPERATURE));
+                activity.receiveFromService(pressureValue, String.valueOf(Constants.STANDARD_TEMPERATURE_20));
             }
 
 

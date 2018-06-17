@@ -8,7 +8,7 @@ package melsion.sansa.joan.pressurealtimeter;
 public class Constants {
     ////////////////////Variables////////////////////////
     //Services
-    public final static String DEFAULT="Default 1013,25 hPa, 20ºC";
+    public final static String DEFAULT="Default 1013,25 hPa, 15ºC";
     public final static String ACCUWEATHER="Accuweather";
     public final static String OPENWEATHERMAP="OpenWeatherMap";
     public final static String DARKSKY="DarkSky";
@@ -26,7 +26,8 @@ public class Constants {
     public final static String WEATHER_GOV="Weather.gov";
     //Values
     public final static double STANDARD_PRESSURE=1013.25;
-    public final static double STANDARD_TEMPERATURE=20;
+    public final static double STANDARD_TEMPERATURE_20 =20;
+    public final static double STANDARD_TEMPERATURE_15 =15;
 
     public static final String DECIMAL_FORMAT = "%.2f";
 
