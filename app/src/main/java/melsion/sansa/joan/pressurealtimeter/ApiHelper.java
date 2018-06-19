@@ -92,7 +92,7 @@ public class ApiHelper {
 
             SharedPreferencesUtils.setString(context, Constants.CALIBRATION_PRESSURE, pressureValue);
 
-            activity.receiveFromService(pressureValue, String.valueOf(Constants.STANDARD_TEMPERATURE));
+            activity.receiveFromService(pressureValue);
 
         } catch (JSONException e) {
             e.printStackTrace();

@@ -10,6 +10,7 @@ public class Constants {
     //Values
     public final static double STANDARD_PRESSURE=1013.25;
     public final static double STANDARD_TEMPERATURE =15;
+    public final static double PRESSURE_OFFSET=2;
 
     public static final String DECIMAL_FORMAT = "%.2f";
 
@@ -18,5 +19,4 @@ public class Constants {
 
     //////////////////////SharedPreferences Keys///////////////////
     public final static String CALIBRATION_PRESSURE = "calibration_pressure";
-    public final static String CALIBRATION_TEMPERATURE = "calibration_temperature";
 }

@@ -23,15 +23,10 @@ public class PressureSensorClass {
     private Context context;
     private MainActivity activity;
     private double pressureValue;
-    private int n;
-    private float average;
-    private float acum;
 
     public PressureSensorClass(MainActivity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
-        n = 0;
-        acum = 0;
     }
 
     public void start() {
@@ -68,7 +63,6 @@ public class PressureSensorClass {
     private final static int AVG_TIME_SECONDS = 15;
     private final static int AVG_WINDOW = 6*AVG_TIME_SECONDS;
     private double[] values = new double[AVG_WINDOW];
-    private int pos=0;
     //Using sliding window median
     //https://stackoverflow.com/questions/11955728/how-to-calculate-the-median-of-an-array
     private void averaging(double value){

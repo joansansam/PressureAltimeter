@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Pressure Altimeter</string>
     <string name="author_email">joansansam@gmail.com</string>
+    <string name="darksky_signature">Powered by <a href="https://darksky.net/poweredby/">DarkSky</a></string>
 </resources>

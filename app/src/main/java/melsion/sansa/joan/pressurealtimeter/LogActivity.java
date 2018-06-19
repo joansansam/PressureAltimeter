@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +19,7 @@ import java.io.File;
 
 public class LogActivity extends AppCompatActivity {
 
-    private TextView logTV;
+    private TextView logTV, signatureTV;
 
     //--------------------------------------------------------------------------
     // LIFE CYCLE
@@ -33,6 +34,9 @@ public class LogActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("Logs");
         logTV = findViewById(R.id.log_tv);
+
+        signatureTV = findViewById(R.id.darksky_signature_tv);
+        signatureTV.setMovementMethod(LinkMovementMethod.getInstance());
 
         if(MainActivity.checkPermissions(this)) {
             String logs = FileUtil.getStringLogs(getApplicationContext());

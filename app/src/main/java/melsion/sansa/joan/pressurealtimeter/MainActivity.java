@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     //--------------------------------------------------------------------------
 
     private PressureSensorClass pressureSensorClass;
-    private TextView pressureBaroTV, heightBaroTV, calibrationPressureTV, calibrationTempTV;
+    private TextView pressureBaroTV, heightBaroTV, calibrationPressureTV;
     private ToggleButton barometerButton;
     private Button callServiceButton;
     private ProgressBar sensorProgressBar;
@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
         barometerButton = findViewById(R.id.baro_btn);
         callServiceButton = findViewById(R.id.call_service_btn);
         calibrationPressureTV = findViewById(R.id.calibration_pressure_tv);
-        calibrationTempTV = findViewById(R.id.calibration_temp_tv);
         sensorProgressBar = findViewById(R.id.sensor_progress_bar);
         serviceProgressBar = findViewById(R.id.service_progress_bar);
         sensorProgressBar.bringToFront();
@@ -76,12 +75,11 @@ public class MainActivity extends AppCompatActivity {
         FileUtil.createFile(getApplicationContext());
 
         String calibrationPressure = SharedPreferencesUtils.getString(this, Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE));
-        String calibrationTemp = SharedPreferencesUtils.getString(this, Constants.CALIBRATION_TEMPERATURE,String.valueOf(Constants.STANDARD_TEMPERATURE));
         calibrationPressureTV.setText(calibrationPressure);
-        calibrationTempTV.setText(calibrationTemp);
 
         barometerButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                sensorProgressBar.bringToFront();
                 if (isChecked) {
                     // The toggle is enabled
                     //Start smartphone sensor listener
@@ -145,11 +143,9 @@ public class MainActivity extends AppCompatActivity {
                             .create()
                             .show();
 
-                    //Use standard pressure and temperature if gps is not enabled
+                    //Use standard pressure if gps is not enabled
                     SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
                     calibrationPressureTV.setText(String.valueOf(Constants.STANDARD_PRESSURE));
-                    SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_TEMPERATURE, String.valueOf(Constants.STANDARD_TEMPERATURE));
-                    calibrationTempTV.setText(String.valueOf(Constants.STANDARD_TEMPERATURE));
                 }
             }
 
@@ -213,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         heightBaroTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,sensorValue));
     }
 
-    public void receiveFromService(String pressureString, String temperatureString){
+    public void receiveFromService(String pressureString){
         //Stop progress bar
         if(serviceProgressBar.getVisibility() != View.GONE) {
             serviceProgressBar.setVisibility(View.GONE);

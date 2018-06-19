@@ -10,31 +10,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
         android:text="Pressure from service: "
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/height_title_tv" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/call_service_btn"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/calibration_pressure_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="11dp"
+        android:layout_height="23dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
         android:text="\?"
-        app:layout_constraintStart_toEndOf="@+id/service_response_title"
-        app:layout_constraintTop_toBottomOf="@+id/height_title_tv" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/service_response_title"
+        app:layout_constraintStart_toEndOf="@+id/service_response_title" />
 
     <ToggleButton
         android:id="@+id/baro_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="ToggleButton"
         android:textAllCaps="false"
         android:textOff="Start"
         android:textOn="Stop"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/baro_title_tv" />
 
@@ -42,9 +42,11 @@
         android:id="@+id/baro_title_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Smartphone Barometer"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -52,12 +54,12 @@
         android:id="@+id/call_service_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="8dp"
         android:text="Calibrate"
         android:textAllCaps="false"
-        app:layout_constraintStart_toEndOf="@+id/calibration_pressure_tv"
-        app:layout_constraintTop_toBottomOf="@+id/height_title_tv" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/pressure_title_tv"
@@ -74,10 +76,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
         android:text="\?"
         app:layout_constraintStart_toEndOf="@+id/pressure_title_tv"
-        app:layout_constraintTop_toBottomOf="@+id/baro_btn" />
+        tools:layout_editor_absoluteY="115dp" />
 
     <TextView
         android:id="@+id/height_title_tv"
@@ -94,30 +95,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:text="\?"
-        app:layout_constraintStart_toEndOf="@+id/height_title_tv"
-        app:layout_constraintTop_toBottomOf="@+id/pressure_baro_tv" />
-
-    <TextView
-        android:id="@+id/calibration_temperature_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="Temperature from service: "
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/service_response_title" />
-
-    <TextView
-        android:id="@+id/calibration_temp_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="\?"
-        app:layout_constraintStart_toEndOf="@+id/calibration_temperature_title"
-        app:layout_constraintTop_toBottomOf="@+id/service_response_title" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/height_title_tv"
+        app:layout_constraintStart_toEndOf="@+id/height_title_tv" />
 
     <ProgressBar
         android:id="@+id/sensor_progress_bar"
