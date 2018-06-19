@@ -16,6 +16,10 @@ import android.widget.TextView;
 
 import java.io.File;
 
+/**
+ * Created by joan.sansa.melsion.
+ */
+
 public class LogActivity extends AppCompatActivity {
 
     private TextView logTV;

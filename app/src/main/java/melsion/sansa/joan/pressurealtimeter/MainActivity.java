@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
                     if(maxVolume==currentVolume || !audio.isVolumeFixed()){
                         //Set volume to the maximum
                         audio.setStreamVolume(VOLUME_STREAM, maxVolume, 0);
-                        // https://stackoverflow.com/questions/28539717/android-startrecording-called-on-an-uninitialized-audiorecord-when-samplerate/28539778
                         //Instantiate jdcWindooManager and start observing sensor changes
                         if (windooSensorClass == null) {
                             windooSensorClass = new WindooSensorClass(MainActivity.this);
