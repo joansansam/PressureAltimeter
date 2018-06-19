@@ -536,8 +536,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*private void enableCalibrations(String formula){
-        //ToDo: check if it works and enable again when another formula.
-        //ToDo: arreglar
+        //must fix, not working
         //Disable callibration controls when not needed
         if(formula.equals(Constants.ANDROID_SENSORMANAGER)) {
             apiSpinner.setEnabled(false);

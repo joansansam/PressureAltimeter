@@ -91,7 +91,7 @@ public class PressureSensorClass {
         }
     }*/
 
-    private final static int AVG_TIME_SECONDS = 15; //ToDo: check best window length
+    private final static int AVG_TIME_SECONDS = 15;
     private final static int AVG_WINDOW = 6*AVG_TIME_SECONDS;
     private double[] values = new double[AVG_WINDOW];
     private int pos=0;
