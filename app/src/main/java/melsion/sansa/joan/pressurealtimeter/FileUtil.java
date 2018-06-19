@@ -17,8 +17,6 @@ import java.io.OutputStream;
 public class FileUtil {
 
     private static FileOutputStream outputStream;
-    private static double baroAvgAux;
-    private static double fromWindooAux;
     private static File file;
 
     public static void createFile(Context context){
@@ -35,7 +33,7 @@ public class FileUtil {
 
         try {
             outputStream = new FileOutputStream(file);
-            String sequence= "date instant_height "+/*averaged_height windoo_heigh*/" \n";
+            String sequence= "date height "+/*averaged_height windoo_heigh*/" \n";
             outputStream.write(sequence.getBytes());
 
         } catch (IOException e) {
@@ -45,36 +43,11 @@ public class FileUtil {
         }
     }
 
-    //This method does not write the zeros between measures in the .csv file
-    /*public static void addToFile(double aux, double baroAvg, double fromWindoo){
-        try {
-            if(baroAvg==0){
-                fromWindooAux=fromWindoo;
-            } else if(fromWindoo==0) {
-                baroAvgAux = baroAvg;
-            }
-            if(fromWindooAux!=0 && baroAvgAux!=0) {
-                String date = DateFormat.format("dd/MM/yyyy-HH:mm:ss", new java.util.Date()).toString();
-                String sequence = date + " " + aux + " " + baroAvgAux + " " + fromWindooAux + "\n";
-                outputStream.write(sequence.replace(".", ",").getBytes());
-                //outputStream.close();
-                fromWindooAux=0;
-                baroAvgAux=0;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("FileUtil", "PROBLEMS SAVING TO FILE");
-            Log.e("FileUtil", e.getMessage());
-        }
-    }*/
-
-    //This method writes the raw data
-
-    public static void addToFile(String baroHeight, String baroAvg, String fromWindoo){
+    public static void addToFile(String baroHeight, String baroAvg){
         try {
             String date = DateFormat.format("dd/MM/yyyy-HH:mm:ss", new java.util.Date()).toString();
 
-            String sequence = date + " " + baroHeight + " " + baroAvg + " " + fromWindoo + "\n";
+            String sequence = date + " " + baroHeight + " " + baroAvg + "\n";
 
             outputStream.write(sequence.replace(".", ",").getBytes());
 

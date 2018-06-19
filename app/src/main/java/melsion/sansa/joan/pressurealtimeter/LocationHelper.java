@@ -65,12 +65,9 @@ public class LocationHelper {
 
                 mFusedLocationClient.removeLocationUpdates(mLocationCallback);
 
-                //Get selected service
-                String selectedService = SharedPreferencesUtils.getString(context,Constants.SELECTED_SERVICE,"");
-
                 //Run API call
                 ApiHelper apiHelper = new ApiHelper();
-                JSONObject response = apiHelper.selectService(activity,selectedService,latitude,longitude);
+                JSONObject response = apiHelper.selectService(activity,latitude,longitude);
             }
         };
     }

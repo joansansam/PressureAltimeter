@@ -59,39 +59,13 @@ public class PressureSensorClass {
             if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
                 pressureValue = (double) event.values[0];
 
-                //To check measures, save them to a file (Try to not use this value, TOO MUCH OVERFLOW IN THE LOG FILE)
-                //double height = PressureToHeightClass.calculate(context, pressureValue);
-                //FileUtil.addToFile(height,"","");
-
                 //Averaging and sending to UI and file
                 averaging(pressureValue);
             }
         }
     };
 
-    //This method averages between each "AVG_WINDOW" input values
-    /*private void averaging(double value) {
-        acum += value;
-        n++;
-        if (n == AVG_WINDOW) { //For every AVG_WINDOW measurements (AVG_TIME_SECONDS seconds), get the average
-            average = acum / n;
-
-            activity.updatePressureUI(average, 0);
-
-            double height = PressureToHeightClass.calculate(context, average);
-
-            //To check measures, save them to a file
-            FileUtil.addToFile("",String.valueOf(height),"");
-
-            activity.updateHeightUI(height,0);
-
-            n = 0;
-            acum = 0;
-            average = 0;
-        }
-    }*/
-
-    private final static int AVG_TIME_SECONDS = 15; //ToDo: check best window length
+    private final static int AVG_TIME_SECONDS = 15;
     private final static int AVG_WINDOW = 6*AVG_TIME_SECONDS;
     private double[] values = new double[AVG_WINDOW];
     private int pos=0;
@@ -101,10 +75,10 @@ public class PressureSensorClass {
         if(AVG_TIME_SECONDS == 0){
 
             //Without averaging
-            activity.updatePressureUI(pressureValue, 0);
+            activity.updatePressureUI(pressureValue);
             double height = PressureToHeightClass.calculate(context, pressureValue);
-            FileUtil.addToFile("", String.valueOf(height), "");
-            activity.updateHeightUI(height, 0);
+            FileUtil.addToFile("", String.valueOf(height));
+            activity.updateHeightUI(height);
             stopProgressBar(activity);
         } else {
 
@@ -124,36 +98,12 @@ public class PressureSensorClass {
                     median = ordered[middle];
                 }
 
-                activity.updatePressureUI(median, 0);
+                activity.updatePressureUI(median);
                 double height = PressureToHeightClass.calculate(context, median);
-                FileUtil.addToFile("", String.valueOf(height), "");
-                activity.updateHeightUI(height, 0);
+                FileUtil.addToFile("", String.valueOf(height));
+                activity.updateHeightUI(height);
                 stopProgressBar(activity);
             }
-
-            //fixed window median
-            /*if(pos < AVG_WINDOW) {
-                values[pos] = value;
-                pos++;
-            } else {
-                pos=0;
-
-                double median;
-                Arrays.sort(values);
-                int middle = values.length/2;
-                if((values.length % 2) == 0) {
-                    double left = values[middle - 1];
-                    double right = values[middle];
-                    median = (left + right)/2;
-                } else {
-                    median = values[middle];
-                }
-
-                activity.updatePressureUI(median, 0);
-                double height = PressureToHeightClass.calculate(context, median);
-                FileUtil.addToFile("",String.valueOf(height),"");
-                activity.updateHeightUI(height,0);
-            }*/
         }
     }
 
