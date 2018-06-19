@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
         callServiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //ToDo: start AlarmManager to calibrate every X minutes - NOT THAT OBVIOUS (maybe it must only calibrate at the starting point)
                 boolean neededConfig = checkGPSandConnection();
                 if (neededConfig) {
                     serviceProgressBar.setProgress(0);
@@ -122,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                     new LocationHelper(MainActivity.this);
                 } else {
                     //Show dialog
-                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
+                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
                     alertDialogBuilder.setTitle("GPS and Internet connection required")
                             .setMessage("You must enable Location and have Internet connection to procedure.")
                             .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
