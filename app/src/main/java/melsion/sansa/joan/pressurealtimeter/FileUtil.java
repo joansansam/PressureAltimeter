@@ -33,7 +33,7 @@ public class FileUtil {
 
         try {
             outputStream = new FileOutputStream(file);
-            String sequence= "date height "+/*averaged_height windoo_heigh*/" \n";
+            String sequence= "date altitude \n";
             outputStream.write(sequence.getBytes());
 
         } catch (IOException e) {
@@ -43,11 +43,11 @@ public class FileUtil {
         }
     }
 
-    public static void addToFile(String baroHeight, String baroAvg){
+    public static void addToFile(String baroAltitude, String baroAvg){
         try {
             String date = DateFormat.format("dd/MM/yyyy-HH:mm:ss", new java.util.Date()).toString();
 
-            String sequence = date + " " + baroHeight + " " + baroAvg + "\n";
+            String sequence = date + " " + baroAltitude + " " + baroAvg + "\n";
 
             outputStream.write(sequence.replace(".", ",").getBytes());
 

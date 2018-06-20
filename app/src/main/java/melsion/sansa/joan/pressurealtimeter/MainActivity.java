@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.location.LocationManager;
-import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -21,13 +20,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -45,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     //--------------------------------------------------------------------------
 
     private PressureSensorClass pressureSensorClass;
-    private TextView pressureBaroTV, heightBaroTV, calibrationPressureTV;
+    private TextView pressureBaroTV, altitudeBaroTV, calibrationPressureTV;
     private ToggleButton barometerButton;
     private Button callServiceButton;
     private ProgressBar sensorProgressBar;
@@ -63,18 +58,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //http://www.fontspace.com/style-7/digital-7
+        //ToDo: algo de copyright http://www.fontspace.com/style-7/digital-7
         Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/digital-7.ttf");
 
         pressureBaroTV = findViewById(R.id.pressure_baro_tv);
-        heightBaroTV = findViewById(R.id.height_baro_tv);
+        altitudeBaroTV = findViewById(R.id.altitude_baro_tv);
         barometerButton = findViewById(R.id.baro_btn);
         callServiceButton = findViewById(R.id.call_service_btn);
         calibrationPressureTV = findViewById(R.id.calibration_pressure_tv);
         sensorProgressBar = findViewById(R.id.sensor_progress_bar);
         serviceProgressBar = findViewById(R.id.service_progress_bar);
 
-        heightBaroTV.setTypeface(tf);
+        altitudeBaroTV.setTypeface(tf);
         pressureBaroTV.setTypeface(tf);
 
         FileUtil.createFile(getApplicationContext());
@@ -95,7 +90,30 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         pressureSensorClass = new PressureSensorClass(MainActivity.this);
-                        pressureSensorClass.start();
+                        boolean isAvailable = pressureSensorClass.start();
+                        if(!isAvailable){
+                            //Stop progress bar
+                            if(sensorProgressBar.getVisibility() != View.INVISIBLE) {
+                                sensorProgressBar.setVisibility(View.INVISIBLE);
+                            }
+                            pressureSensorClass=null;
+                            barometerButton.setChecked(false);
+
+                            //Tell the user barometer not available
+                            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                            permissionsAlertDialog = alertDialogBuilder.setTitle("Barometer not found.")
+                                    .setMessage("This device does not seem to have a pressure sensor.")
+                                    .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+
+                                        }
+                                    })
+                                    .create();
+                            if(!permissionsAlertDialog.isShowing()) {
+                                permissionsAlertDialog.show();
+                            }
+                        }
                     }
 
                 } else {
@@ -205,11 +223,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Update TextView with calculated height
+     * Update TextView with calculated altitude
      * @param sensorValue
      */
-    public void updateHeightUI(double sensorValue){
-        heightBaroTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,sensorValue));
+    public void updateAltitudeUI(double sensorValue){
+        altitudeBaroTV.setText(String.format(Locale.ENGLISH, Constants.DECIMAL_FORMAT,sensorValue));
     }
 
     public void receiveFromService(String pressureString){
@@ -220,8 +238,10 @@ public class MainActivity extends AppCompatActivity {
 
         calibrationPressureTV.setText(pressureString);
 
-        double sensorHeight = PressureToHeightClass.calculate(getApplicationContext(), sensorPressure);
-        updateHeightUI(sensorHeight);
+        if(pressureSensorClass != null) {
+            double sensorAltitude = PressureToAltitudeClass.calculate(getApplicationContext(), sensorPressure);
+            updateAltitudeUI(sensorAltitude);
+        }
     }
 
     //--------------------------------------------------------------------------

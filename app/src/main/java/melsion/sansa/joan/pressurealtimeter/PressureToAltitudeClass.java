@@ -12,7 +12,7 @@ import static java.lang.Math.pow;
  * https://github.com/joansansam/PressureAltimeter
  */
 
-public class PressureToHeightClass {
+public class PressureToAltitudeClass {
     //CONSTANTS
     private static double M=0.0289644;
     private static double g=9.80665;

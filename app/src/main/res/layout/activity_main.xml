@@ -81,22 +81,22 @@
         app:layout_constraintTop_toBottomOf="@+id/baro_btn" />
 
     <TextView
-        android:id="@+id/height_title_tv"
+        android:id="@+id/altitude_title_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="Height: "
-        app:layout_constraintBaseline_toBaselineOf="@+id/height_baro_tv"
+        android:text="Altitude: "
+        app:layout_constraintBaseline_toBaselineOf="@+id/altitude_baro_tv"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/height_baro_tv"
+        android:id="@+id/altitude_baro_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="\?"
         android:textSize="96sp"
-        app:layout_constraintStart_toEndOf="@+id/height_title_tv"
+        app:layout_constraintStart_toEndOf="@+id/altitude_title_tv"
         app:layout_constraintTop_toBottomOf="@+id/pressure_baro_tv" />
 
     <ProgressBar

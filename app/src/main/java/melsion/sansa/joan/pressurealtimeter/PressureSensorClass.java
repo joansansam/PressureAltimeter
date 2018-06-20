@@ -29,11 +29,11 @@ public class PressureSensorClass {
         this.context = activity.getApplicationContext();
     }
 
-    public void start() {
+    public boolean start() {
         //Get SensorManager instance
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         //Register listener
-        sensorManager.registerListener(sensorListener, sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE), SensorManager.SENSOR_DELAY_NORMAL);
+        return sensorManager.registerListener(sensorListener, sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void stop() {
@@ -70,9 +70,9 @@ public class PressureSensorClass {
 
             //Without averaging
             activity.updatePressureUI(pressureValue);
-            double height = PressureToHeightClass.calculate(context, pressureValue);
-            FileUtil.addToFile("", String.valueOf(height));
-            activity.updateHeightUI(height);
+            double altitude = PressureToAltitudeClass.calculate(context, pressureValue);
+            FileUtil.addToFile("", String.valueOf(altitude));
+            activity.updateAltitudeUI(altitude);
             stopProgressBar(activity);
         } else {
 
@@ -93,9 +93,9 @@ public class PressureSensorClass {
                 }
 
                 activity.updatePressureUI(median);
-                double height = PressureToHeightClass.calculate(context, median);
-                FileUtil.addToFile("", String.valueOf(height));
-                activity.updateHeightUI(height);
+                double altitude = PressureToAltitudeClass.calculate(context, median);
+                FileUtil.addToFile("", String.valueOf(altitude));
+                activity.updateAltitudeUI(altitude);
                 stopProgressBar(activity);
             }
         }
