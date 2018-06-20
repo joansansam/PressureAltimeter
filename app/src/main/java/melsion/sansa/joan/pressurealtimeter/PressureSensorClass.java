@@ -104,8 +104,8 @@ public class PressureSensorClass {
     private void stopProgressBar(Activity activity){
         ProgressBar sensorProgressBar = activity.findViewById(R.id.sensor_progress_bar);
         //Stop progress bar
-        if(sensorProgressBar.getVisibility() != View.GONE) {
-            sensorProgressBar.setVisibility(View.GONE);
+        if(sensorProgressBar.getVisibility() != View.INVISIBLE) {
+            sensorProgressBar.setVisibility(View.INVISIBLE);
         }
     }
 }

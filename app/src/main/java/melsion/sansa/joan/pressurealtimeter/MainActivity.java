@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
@@ -62,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //http://www.fontspace.com/style-7/digital-7
+        Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/digital-7.ttf");
+
         pressureBaroTV = findViewById(R.id.pressure_baro_tv);
         heightBaroTV = findViewById(R.id.height_baro_tv);
         barometerButton = findViewById(R.id.baro_btn);
@@ -69,8 +73,9 @@ public class MainActivity extends AppCompatActivity {
         calibrationPressureTV = findViewById(R.id.calibration_pressure_tv);
         sensorProgressBar = findViewById(R.id.sensor_progress_bar);
         serviceProgressBar = findViewById(R.id.service_progress_bar);
-        sensorProgressBar.bringToFront();
-        serviceProgressBar.bringToFront();
+
+        heightBaroTV.setTypeface(tf);
+        pressureBaroTV.setTypeface(tf);
 
         FileUtil.createFile(getApplicationContext());
 
@@ -79,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
 
         barometerButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                sensorProgressBar.bringToFront();
                 if (isChecked) {
                     // The toggle is enabled
                     //Start smartphone sensor listener
@@ -96,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     //Stop progress bar
-                    if(sensorProgressBar.getVisibility() != View.GONE) {
-                        sensorProgressBar.setVisibility(View.GONE);
+                    if(sensorProgressBar.getVisibility() != View.INVISIBLE) {
+                        sensorProgressBar.setVisibility(View.INVISIBLE);
                     }
                     // The toggle is disabled
                     //Liberate sensor listeners
@@ -210,8 +214,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void receiveFromService(String pressureString){
         //Stop progress bar
-        if(serviceProgressBar.getVisibility() != View.GONE) {
-            serviceProgressBar.setVisibility(View.GONE);
+        if(serviceProgressBar.getVisibility() != View.INVISIBLE) {
+            serviceProgressBar.setVisibility(View.INVISIBLE);
         }
 
         calibrationPressureTV.setText(pressureString);
