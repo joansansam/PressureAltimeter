@@ -52,7 +52,8 @@ public class PressureSensorClass {
 
             //Check sensor type.
             if (event.sensor.getType() == Sensor.TYPE_PRESSURE) {
-                pressureValue = (double) event.values[0];
+                double offset = Double.valueOf(SharedPreferencesUtils.getString(activity.getApplicationContext(), Constants.SELECTED_OFFSET, String.valueOf(Constants.PRESSURE_OFFSET_DEFAULT)));
+                pressureValue = (double) event.values[0] + offset;
 
                 //Averaging and sending to UI and file
                 averaging(pressureValue);

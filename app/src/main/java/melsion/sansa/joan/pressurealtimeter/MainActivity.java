@@ -2,6 +2,8 @@ package melsion.sansa.joan.pressurealtimeter;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,10 +45,12 @@ public class MainActivity extends AppCompatActivity {
     private PressureSensorClass pressureSensorClass;
     private TextView pressureBaroTV, altitudeBaroTV, calibrationPressureTV;
     private ToggleButton barometerButton;
-    private Button callServiceButton;
+    private Button callServiceButton, correctionValueBtn;
     private ProgressBar sensorProgressBar;
     private ProgressBar serviceProgressBar;
     private static AlertDialog permissionsAlertDialog;
+
+    private static int layoutWidth, layoutHeight;
 
     private double sensorPressure;
 
@@ -68,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         calibrationPressureTV = findViewById(R.id.calibration_pressure_tv);
         sensorProgressBar = findViewById(R.id.sensor_progress_bar);
         serviceProgressBar = findViewById(R.id.service_progress_bar);
+        correctionValueBtn = findViewById(R.id.correction_value);
 
         altitudeBaroTV.setTypeface(tf);
         pressureBaroTV.setTypeface(tf);
@@ -76,6 +82,20 @@ public class MainActivity extends AppCompatActivity {
 
         String calibrationPressure = SharedPreferencesUtils.getString(this, Constants.CALIBRATION_PRESSURE,String.valueOf(Constants.STANDARD_PRESSURE));
         calibrationPressureTV.setText(calibrationPressure);
+
+        String selectedOffset = SharedPreferencesUtils.getString(this, Constants.SELECTED_OFFSET, String.valueOf(Constants.PRESSURE_OFFSET_DEFAULT));
+        correctionValueBtn.setText(selectedOffset);
+        correctionValueBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                DisplayMetrics metrics = getApplicationContext().getResources().getDisplayMetrics();
+                layoutWidth = metrics.widthPixels;
+                layoutHeight = metrics.heightPixels;
+
+                OffsetDialogFragment offsetDialogFragment = new OffsetDialogFragment();
+                offsetDialogFragment.show(getFragmentManager(),Constants.SELECTED_OFFSET);
+            }
+        });
 
         barometerButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -317,5 +337,42 @@ public class MainActivity extends AppCompatActivity {
         return enabled;
     }
 
+    public static class OffsetDialogFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final String[] offsetArray = new String[101];
+            for(int i=0; i<101; i++){
+                offsetArray[i] = Double.toString((double)i/10);
+            }
+
+            final Activity activity = getActivity();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("Select correction for barometer in hPa")
+                    .setCancelable(true)
+                    .setItems(offsetArray, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferencesUtils.setString(getContext(),Constants.SELECTED_OFFSET,offsetArray[which]);
+                            dialog.dismiss();
+
+                            ((Button)activity.findViewById(R.id.correction_value)).setText(offsetArray[which]);
+                        }
+                    });
+
+            return builder.create();
+        }
+
+        @Override
+        public void onStart(){
+            super.onStart();
+            if (getDialog() == null)
+                return;
+
+            getDialog().getWindow().setLayout(layoutWidth-80, layoutHeight/2);
+        }
+    }
+
 }
+
+
 

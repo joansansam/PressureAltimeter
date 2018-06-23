@@ -1,11 +1,8 @@
 package melsion.sansa.joan.pressurealtimeter;
 
 import android.content.Context;
-import android.hardware.SensorManager;
 
-import static java.lang.Math.exp;
 import static java.lang.Math.log;
-import static java.lang.Math.pow;
 
 /**
  * Created by joan.sansa.melsion on 14/05/2018.
@@ -21,8 +18,6 @@ public class PressureToAltitudeClass {
     public static double calculate(Context context, double P) {
         double P0 = Double.valueOf(SharedPreferencesUtils.getString(context,Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE)));
         double T = Constants.STANDARD_TEMPERATURE;
-
-        P=P+Constants.PRESSURE_OFFSET;
 
         double h;
         double Tk = T + 273.15;

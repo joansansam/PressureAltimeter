@@ -94,6 +94,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="\?"
         android:textSize="96sp"
         app:layout_constraintStart_toEndOf="@+id/altitude_title_tv"
@@ -128,6 +129,37 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/correction_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:layout_marginStart="8dp"
+        android:text="Barometer error correction:"
+        app:layout_constraintBottom_toTopOf="@+id/service_response_title"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/correction_value"
+        style="@android:style/Widget.Material.Light.Button.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:backgroundTint="@android:color/white"
+        android:text="\?"
+        android:textAllCaps="false"
+        app:layout_constraintBaseline_toBaselineOf="@+id/correction_title"
+        app:layout_constraintStart_toEndOf="@+id/correction_title" />
+
+    <TextView
+        android:id="@+id/hpa_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="hPa"
+        app:layout_constraintBaseline_toBaselineOf="@+id/correction_value"
+        app:layout_constraintStart_toEndOf="@+id/correction_value" />
 
 
 </android.support.constraint.ConstraintLayout>
