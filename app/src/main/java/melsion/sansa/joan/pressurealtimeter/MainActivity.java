@@ -27,8 +27,8 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import java.util.Locale;
 
 /**
@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //ToDo: algo de copyright http://www.fontspace.com/style-7/digital-7
         Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/digital-7.ttf");
 
         pressureBaroTV = findViewById(R.id.pressure_baro_tv);
@@ -154,42 +153,45 @@ public class MainActivity extends AppCompatActivity {
         callServiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean neededConfig = checkGPSandConnection();
-                if (neededConfig) {
-                    serviceProgressBar.setProgress(0);
-                    if(serviceProgressBar.getVisibility() != View.VISIBLE) {
-                        serviceProgressBar.setVisibility(View.VISIBLE);
+                if(checkServiceCalls()) {
+                    boolean neededConfig = checkGPSandConnection();
+                    if (neededConfig) {
+                        serviceProgressBar.setProgress(0);
+                        if (serviceProgressBar.getVisibility() != View.VISIBLE) {
+                            serviceProgressBar.setVisibility(View.VISIBLE);
+                        }
+                        new LocationHelper(MainActivity.this);
+                    } else {
+                        //Show dialog
+                        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                        alertDialogBuilder.setTitle("GPS and Internet connection required")
+                                .setMessage("You must enable Location and have Internet connection to procedure.")
+                                .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //Open permissions settings
+                                        Intent intent = new Intent(Settings.ACTION_SETTINGS);
+                                        startActivityForResult(intent, 0);
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                })
+                                .setCancelable(false)
+                                .create()
+                                .show();
+
+                        //Use standard pressure if gps is not enabled
+                        SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
+                        calibrationPressureTV.setText(String.valueOf(Constants.STANDARD_PRESSURE));
                     }
-                    new LocationHelper(MainActivity.this);
                 } else {
-                    //Show dialog
-                    final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-                    alertDialogBuilder.setTitle("GPS and Internet connection required")
-                            .setMessage("You must enable Location and have Internet connection to procedure.")
-                            .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //Open permissions settings
-                                    Intent intent = new Intent(Settings.ACTION_SETTINGS);
-                                    startActivityForResult(intent,0);
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                }
-                            })
-                            .setCancelable(false)
-                            .create()
-                            .show();
-
-                    //Use standard pressure if gps is not enabled
-                    SharedPreferencesUtils.setString(getApplicationContext(), Constants.CALIBRATION_PRESSURE, String.valueOf(Constants.STANDARD_PRESSURE));
-                    calibrationPressureTV.setText(String.valueOf(Constants.STANDARD_PRESSURE));
+                    Toast.makeText(getApplicationContext(), "Maximum number of calls per day reached (1000 calls). Wait until tomorrow",Toast.LENGTH_LONG).show();
                 }
             }
-
         });
 
         checkPermissions(this);
@@ -335,6 +337,23 @@ public class MainActivity extends AppCompatActivity {
             Log.e("Location", "Internet or GPS is not activated.");
         }
         return enabled;
+    }
+
+    private boolean checkServiceCalls(){
+        boolean ok;
+        long currentTime = System.currentTimeMillis();
+        long firstCallTime = SharedPreferencesUtils.getLong(getApplicationContext(),Constants.FIRST_SERVICE_CALL,currentTime);
+
+        if((currentTime-firstCallTime) < 24*60*60*1000){
+            int serviceCalls = SharedPreferencesUtils.getInt(getApplicationContext(),Constants.SERVICE_CALLS,0);
+            ok = serviceCalls < 1000;
+        } else {
+            SharedPreferencesUtils.setInt(getApplicationContext(),Constants.SERVICE_CALLS,0);
+            ok = true;
+        }
+
+        return ok;
+
     }
 
     public static class OffsetDialogFragment extends DialogFragment {

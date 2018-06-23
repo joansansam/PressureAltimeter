@@ -45,7 +45,7 @@ public class FileUtil {
 
     public static void addToFile(String baroAltitude, String baroAvg){
         try {
-            String date = DateFormat.format("dd/MM/yyyy-HH:mm:ss", new java.util.Date()).toString();
+            String date = DateFormat.format(Constants.DATE_FORMAT, new java.util.Date()).toString();
 
             String sequence = date + " " + baroAltitude + " " + baroAvg + "\n";
 

@@ -71,10 +71,16 @@ public class SharedPreferencesUtils {
     }
 
     public static void clearSharedPreferences(Context context){
+        int serviceCalls = getInt(context, Constants.SERVICE_CALLS, 0);
+        long firstServiceCall = getLong(context, Constants.FIRST_SERVICE_CALL, System.currentTimeMillis());
+
         SharedPreferences preferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();
+
+        setInt(context, Constants.SERVICE_CALLS, serviceCalls);
+        setLong(context,Constants.FIRST_SERVICE_CALL, firstServiceCall);
     }
 
 }

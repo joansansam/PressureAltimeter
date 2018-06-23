@@ -13,7 +13,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Locale;
 
 /**
  * Created by joan.sansa.melsion on 24/04/2018.
@@ -31,8 +30,6 @@ public class ApiHelper {
         this.activity = activity;
         this.context = activity.getApplicationContext();
 
-        //ToDo: controlar el màxim de calls per dia: 50 accuweather, 1000 darksky
-        //ToDo: si acaba sent el service definitiu afegir powered by DarkSky https://darksky.net/dev/docs
         urlString = "https://api.darksky.net/forecast/4f237579222e7fd80fa327b8c57c532d/" + lat + "," + lon;
         serviceCall();
 
@@ -59,6 +56,13 @@ public class ApiHelper {
                     while((tmp = reader.readLine()) != null)
                         json.append(tmp).append("\n");
                     reader.close();
+
+                    int serviceCalls = SharedPreferencesUtils.getInt(context, Constants.SERVICE_CALLS, 0);
+                    if(serviceCalls == 0){
+                        long currentTime = System.currentTimeMillis();
+                        SharedPreferencesUtils.setLong(context, Constants.FIRST_SERVICE_CALL, currentTime);
+                    }
+                    SharedPreferencesUtils.setInt(context, Constants.SERVICE_CALLS, serviceCalls+1);
 
                     String jsonString = json.toString();
                     //Beautify json in order to construct the JSONObject correctly
