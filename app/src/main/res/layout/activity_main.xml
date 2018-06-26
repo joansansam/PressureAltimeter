@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Pressure from service: "
+        android:text="Pressure from service (hPa): "
         app:layout_constraintBaseline_toBaselineOf="@+id/call_service_btn"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -65,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Pressure: "
+        android:text="Pressure (hPa): "
         app:layout_constraintBaseline_toBaselineOf="@+id/pressure_baro_tv"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -85,7 +85,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Altitude: "
+        android:text="Altitude (m):"
         app:layout_constraintBaseline_toBaselineOf="@+id/altitude_baro_tv"
         app:layout_constraintStart_toStartOf="parent" />
 
